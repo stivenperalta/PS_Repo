@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography">
+  <b:Source>
+    <b:SourceType>Book</b:SourceType>
+    <b:Title>The elements of user experience user-centered design for the Web</b:Title>
+    <b:Year>2002</b:Year>
+    <b:Publisher>AIGA</b:Publisher>
+    <b:Author>
+      <b:Author>
+        <b:NameList>
+          <b:Person>
+            <b:First>Jesse James</b:First>
+            <b:Last>Garrett</b:Last>
+          </b:Person>
+        </b:NameList>
+      </b:Author>
+      <b:Editor>
+        <b:NameList>
+          <b:Person>
+            <b:First></b:First>
+            <b:Last>New York: AIGA</b:Last>
+          </b:Person>
+        </b:NameList>
+      </b:Editor>
+    </b:Author>
+    <b:City>New York</b:City>
+    <b:Edition>1st ed.</b:Edition>
+    <b:Tag>the-elements-of-user-experience-user-centered-design-for-the-web</b:Tag>
+  </b:Source>
+</b:Sources>
