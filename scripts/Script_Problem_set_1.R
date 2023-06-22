@@ -81,20 +81,30 @@ table1$yhat1<-ifelse(table1$sueldo_mens!=0, predict(reg_w_age), 0)
 table1$yhat2<-ifelse(table1$sueldo_mens!=0, predict(reg_w_age2), 0)
 
 
+summ_table1 <- table1 %>%  
+  group_by(
+    age, age2
+  ) %>%  
+  summarize(
+    mean_y = mean(logw),
+    yhat_reg = mean(yhat1), .groups="drop"
+  ) 
 
-table1 %>%
-  ggplot( aes(x=, y=logw, fill=name)) +
-  geom_boxplot() +
-  scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-  geom_jitter(color="black", size=0.4, alpha=0.9) +
-  theme_ipsum() +
-  theme(
-    legend.position="none",
-    plot.title = element_text(size=11)
+ggplot(summ_table1) + 
+  geom_point(
+    aes(x = age, y = mean_y),
+    color = "5", size = 2
+  ) + 
+  geom_line(
+    aes(x = age, y = yhat_reg), 
+    color = "8", size = 1.5
+  ) + 
+  labs(
+    title = "Log Sueldo por Edad",
+    x = "Edad",
+    y = "Log Sueldos"
   ) +
-  ggtitle("A boxplot with jitter") +
-  xlab("")
-
+  theme_bw()
 
 # Question 4: The gender earnings GAP -------------------------------------
 
