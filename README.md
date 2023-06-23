@@ -1,18 +1,30 @@
-# Problem Set Template Repository for Big Data and Machine Learning for Applied Economics
+![BDML-Banner](https://github.com/stivenperalta/Problem_set_1/assets/137315725/09325f91-f3df-45b0-9934-0816cb760b89)
 
-This is the template repository for the problem sets.
+# TALLER 1: PREDICCIÓN DEL INGRESO GEIH
 
-The repo should contain at least four folders:
+Este repositorio contiene el primer taller desarrollado en el marco del curso de Big Data y Machine Learning de la Facultad de Economia de la Universidad de los Andes durante el periodo intersemestral de 2023, realizado siguiendo las indicaciones definidas en el   [problem set](document/Problem_Set_1%20%28preguntas%29.pdf) del curso.
 
-- `document`: contains your final document in `pdf` format. Ideally, the document should pull figures and tables directly from the `views` folder. I've included a latex template I created for the Thesis Seminar. 
-- `scripts`: contains all your scripts
-- `stores`: contains all the data sets used. If files are "too big" for GitHub, include a document describing where people can access the data.
-- `views`: contains all figures and tables
+Este trabajo busca analizar diferentes variables que afectan el comportamiento del salario *(edad de los trabajadores, sexo, nivel educativo, estrato socioeconomico, entre otras)*, y posteriormente, desarrollar un modelo predictivo del salario que pueda identificar *outliers* en los reportes de salario asi como caracteristicas relevantes a considerar para la  identificacion de individuos vulnerables, lo aterior con base en la informacion recogida por la Gran Encuesta Integrada de Hogares (GEIH) realizada por el Departamento Administrativo Nacional de Estadistica (DANE) en 2018.
+
+### Estructura del repositorio
+
+Los archivos en este repositorio estan contenidos en las siguientes carpetas:
+
+- `document`: Contiene los documentos revisados para el desarrollo del trabajo, incluyendo el [documento final](document/Taller_1.pdf) del trabajo.
+- `scripts`: Contiene todos los scripts en R para el desarrollo del trabajo.
+- `stores`: Contiene los data sets usados para el trabajo, corresponde a información de la GEIH-2018 extraida por web scrapping.
+- `views`: Contiene todas las imagenes y tablas generadas, las cuales se incluyen en el [documento final](document/Taller_1.pdf) del trabajo.
 
 
+### Integrantes
 
-## Some general reminders: 
+Jose Nicoñas Barragan Mendez - Cod. est. 20133204 
 
-- It is essential how you write up the document. Be sure to be organized and consistent in explaining your equations and findings. Make sure that there are no compilation errors.
-- Write understandable code, separating and commenting on each section. Coding, like in writing, style is critical for readability. If the code is well written, it should be self-contained. There is no need to write everything you did. I encourage you to follow the [tidyverse style guide](https://style.tidyverse.org/)
+Andrea Yeraldine Clavijo Mora- Cod. est. 202213310 
+
+Jazmine Poxana Galdos Garreta - Cod. est. 202120623 
+
+Sergio Alejandro Jimenez Oviedo - Cod. est. 202214467 
+
+David Stiven Peralta Mendieta - Cod. est. 201718234 
 
