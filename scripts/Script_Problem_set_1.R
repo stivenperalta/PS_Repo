@@ -65,7 +65,7 @@ names(table1)
 
 #Model: log(w) = β1 + β2Age + β3Age2 + u
 
-#Variable Salario: sueldo_mens FACTOR DE EXPANSION
+#Variable Salario:
 table1<-table1%>% mutate(logw=log(sueldo_mens))
 table1<-table1%>% mutate(age2=age^2)
 summary(table1$logw)
