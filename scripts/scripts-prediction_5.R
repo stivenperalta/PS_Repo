@@ -29,7 +29,9 @@ train  <- GEIH[sample, ]
 test   <- GEIH[!sample, ] 
 
 #generacion de 5 especificaciones
-
-##Se incluyen aqui los modelos de los otros puntos
-
+# especificacion 1
+model1<-lm(log_salario_hora_imputado~edad + sexo + educacion_tiempo + emprendedor + estrato + formal_informal  + t_horas_trabajadas,data=train)
+summary(model1)
+test$model1<-predict(model1,newdata = test)
+with(test,mean((log_salario_hora_imputado-model1)^2))
 
