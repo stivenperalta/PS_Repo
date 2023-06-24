@@ -111,6 +111,8 @@ grafico3_1<-ggplot(summ) +
   ) +
   theme_bw()
 
+grafico3_1 #para visualizarlo 
+
 #Grabamos la gráfica
 ggsave(
   file="../views/Pregunta_3_bondad_ajuste.jpg",
@@ -138,17 +140,23 @@ model_wage_age_fn<- function(data, index) {
 
 model_wage_age_fn(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo peak age en el modelo general
 
+set.seed(12345) #para que sea reproducible
 err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
-err_est_wage_age
+plot(err_est_wage_age) #para ver la distribución de los resultados de boot
+
 se<- apply(err_est_wage_age$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
 
-#Intervalos de confianza
-#Definimos el intervalo de confianza del 95%
-z <- 1.96
 
-#Calcular los intervalos de confianza
-summ<-summ %>% mutate(ic_sup=yhat_reg_edad+(z*se))
-summ<-summ %>% mutate(ic_inf=yhat_reg_edad-(z*se))
+#Intervalos de confianza
+#Cálculos de intervalos de confianza
+conf_int<-boot.ci(boot.out=err_est_wage_age, type=c("norm"), conf=0.95) #cálculo de los intervalos de confianza boot
+conf_int
+
+#Extraemos los valores inferiores y superiores del intervalo de confianza
+ic_sup<-conf_int$normal[3]
+ic_inf<-conf_int$normal[2]
+ic_sup
+ic_inf
 
 #Graficas
 
