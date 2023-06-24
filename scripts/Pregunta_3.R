@@ -22,7 +22,7 @@ getwd()
 # Import filtered data ----------------------------------------------------
 
 GEIH <- read_excel("../stores/GEIH")
-summary(GEIH)
+summary(GEIH$log_salario_hora)
 names(GEIH)
 GEIH<-GEIH %>% rename (mujer="sexo")
 GEIH<-GEIH[!is.na(GEIH$log_salario_hora),] #para poder correr todo el código
@@ -104,11 +104,11 @@ err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
 err_est_wage_age
 
 #Graficas
-g1 <- ggplot(GEIH, aes(x=edad, y=predic2a)) + 
-  geom_point(col = "red" , size = 1.5) +
+g1 <- ggplot(GEIH, aes(x=edad, y=yhat)) + 
+  geom_point(col = "7" , size = 1.5) +
   geom_smooth(method='lm', formula=y~x, se=FALSE, col='brown1') +
   theme_light()
-
+g1
 
 # Question 4: The gender earnings GAP -------------------------------------
 
