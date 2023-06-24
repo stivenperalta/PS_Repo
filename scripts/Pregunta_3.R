@@ -30,9 +30,9 @@ GEIH<-GEIH[!is.na(GEIH$log_salario_hora),] #para poder correr todo el código
 # Question 3- Estimating the Age-wage profile profile--------
 
 #Model: log(w) = β1 + β2Age + β3Age2 + u
-reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=GEIH, weights=fex_c) #modelo general con factor de expansión
-reg_w_age_mujer<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==1, data=GEIH, weights=fex_c) #modelo para mujeres con factor de expansión
-reg_w_age_hombre<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==0, data=GEIH, weights=fex_c) #modelo para hombres con factor de expansión
+reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=GEIH) #modelo general
+reg_w_age_mujer<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres
+reg_w_age_hombre<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==0, data=GEIH) #modelo para hombres
 
 reg_w_age$AIC<-AIC(reg_w_age) #Akaike para modelo general
 reg_w_age_mujer$AIC<-AIC(reg_w_age_mujer) #Akaike para modelo mujeres
@@ -84,6 +84,44 @@ resumen_edad_max <- data.frame(General=edad_max,
                     Hombres=edad_max_hombre)
 knitr::kable(resumen_edad_max, format = "simple", caption="Edad en pico de sueldo")
 
+#Gráfica diferencia de ybarra y yhat
+summ <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredicho del modelo
+  group_by(
+    edad, edad2
+  ) %>%  
+  summarize(
+    mean_y_edad = mean(log_salario_hora),
+    yhat_reg_edad = mean(yhat), .groups="drop"
+  ) 
+
+#Creamos la gráfica y la grabamos como un dato separado
+grafico3_1<-ggplot(summ) + 
+  geom_point(
+    aes(x = edad, y = mean_y_edad),
+    color = 4, size = 2
+  ) + 
+  geom_line(
+    aes(x = edad, y = yhat_reg_edad), 
+    color = 7, size = 1.5
+  ) + 
+  labs(
+    title = "ln Salarios por Edad",
+    x = "Edad",
+    y = "ln Salarios"
+  ) +
+  theme_bw()
+
+#Grabamos la gráfica
+ggsave(
+  file="../views/Pregunta_3_bondad_ajuste.jpg",
+  plot = grafico3_1,
+  scale = 1,
+  width = 15,
+  height = 10,
+  units = "cm",
+  dpi = 300,
+)
+
 #Standard errors usando bootstrap
 
 #Función para Bootstrap
@@ -94,7 +132,7 @@ model_wage_age_fn<- function(data, index) {
                     b2<-coefs[2]
                     b3<-coefs[3]
                     
-                    edad_max_bt<-(-b2_w_age/(2*b3_w_age))
+                    edad_max_bt<-(-b2/(2*b3))
                     return(edad_max_bt)
 }
 
@@ -102,18 +140,27 @@ model_wage_age_fn(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo peak ag
 
 err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
 err_est_wage_age
+se<- apply(err_est_wage_age$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
+
+#Intervalos de confianza
+#Definimos el intervalo de confianza del 95%
+z <- 1.96
+
+#Calcular los intervalos de confianza
+summ<-summ %>% mutate(ic_sup=yhat_reg_edad+(z*se))
+summ<-summ %>% mutate(ic_inf=yhat_reg_edad-(z*se))
 
 #Graficas
-g1 <- ggplot(GEIH, aes(x=edad, y=yhat)) + 
-  geom_point(col = "7" , size = 1.5) +
-  geom_smooth(method='lm', formula=y~x, se=FALSE, col='brown1') +
+
+p3 <- ggplot(summ, aes(x=edad, y=yhat_reg_edad)) +
+  geom_point(col=4) +
+  geom_smooth(method=lm , formula= y~x+x^2, color=7, fill="#69b3a2", se=TRUE) +
   theme_light()
-g1
+p3
 
-# Question 4: The gender earnings GAP -------------------------------------
-
-#Model1: log(w) = β1 + β2Female + u
-
-
-
+grafica <- ggplot(summ, aes(x = edad, y = yhat_reg_edad)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = ic_inf, ymax = ic_sup), alpha = 0.3) + #
+  labs(x = "Edad", y = "salario promedio")
+grafica
 
