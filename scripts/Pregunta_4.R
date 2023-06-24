@@ -4,7 +4,7 @@ rm(list = ls()) # Limpiar Rstudio
 
 options(scipen = 20,  digits=10)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr, readxl) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
