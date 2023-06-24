@@ -10,7 +10,7 @@ rm(list = ls()) # Limpiar Rstudio
 
 options(scipen = 20,  digits=10)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, readxl, knitr) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -160,9 +160,8 @@ ic_inf
 
 #Graficas
 
-grafica <- ggplot(summ, aes(x = edad, y = yhat_reg_edad)) +
-  geom_line() + 
-  geom_ribbon(aes(ymin = ic_inf, ymax = ic_sup), alpha = 0.2) + #
-  labs(x = "Edad", y = "salario promedio")
-grafica
 
+grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora)) +
+  geom_point(col=4, size=1) +
+  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)
+grafica
