@@ -8,7 +8,7 @@
 
 rm(list = ls()) # Limpiar Rstudio
 
-options(scipen = 20,  digits=2)
+options(scipen = 20,  digits=10)
 require(pacman)
 p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr) # Cargar varios paquetes al tiempo
 
@@ -69,7 +69,11 @@ b2_w_age_hombre<-coefs_w_age_hombre[2]
 b3_w_age_hombre<-coefs_w_age_hombre[3]
 
 #Predict yhat
-GEIH$yhat<-ifelse(GEIH$log_salario_hora!=0, predict(reg_w_age), 0)
+GEIH$yhat<-predict(reg_w_age)
+GEIH$yhat<-if(GEIH$mujer==0, predict(reg_w_age), 0)
+GEIH$yhat<-if(GEIH$hombre!=0, predict(reg_w_age), 0)
+
+
 
 #Cálculo edad donde se maximiza el salario
 edad_max<- (-b2_w_age/(2*b3_w_age)) #modelo general
@@ -84,23 +88,24 @@ knitr::kable(resumen_edad_max, format = "rst", caption="Edad en pico de sueldo")
 #Standard errors usando bootstrap
 
 #Función para Bootstrap
-model_wage_age_fn<- function(data, index, edad_barra=mean(edad)) {
+model_wage_age_fn<- function(data, index) {
                     f<- lm(formula=log_salario_hora~edad+edad2, data, subset=index)
                     
                     coefs<-f$coefficients
                     b2<-coefs[2]
                     b3<-coefs[3]
                     
-                    edad_max_bt<--(b2_w_age/(2*b3_w_age))
+                    edad_max_bt<-(-b2_w_age/(2*b3_w_age))
                     return(edad_max_bt)
 }
 
-model_wage_age_fn(GEIH,1:nrow(GEIH))
+model_wage_age_fn(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo peak age en el modelo general
 
-err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
+err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=10000)
 err_est_wage_age
 
-g3 <- ggplot(db, aes(x=edad, y=predic2a)) + 
+#Graficas
+g1 <- ggplot(GEIH, aes(x=edad, y=predic2a)) + 
   geom_point(col = "red" , size = 1.5) +
   geom_smooth(method='lm', formula=y~x, se=FALSE, col='brown1') +
   theme_light()
