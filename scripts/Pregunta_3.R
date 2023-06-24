@@ -10,7 +10,7 @@ rm(list = ls()) # Limpiar Rstudio
 
 options(scipen = 20,  digits=10)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, readxl, knitr) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -111,6 +111,8 @@ grafico3_1<-ggplot(summ) +
   ) +
   theme_bw()
 
+grafico3_1 #para visualizarlo 
+
 #Grabamos la gráfica
 ggsave(
   file="../views/Pregunta_3_bondad_ajuste.jpg",
@@ -138,29 +140,28 @@ model_wage_age_fn<- function(data, index) {
 
 model_wage_age_fn(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo peak age en el modelo general
 
+set.seed(12345) #para que sea reproducible
 err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
-err_est_wage_age
+plot(err_est_wage_age) #para ver la distribución de los resultados de boot
+
 se<- apply(err_est_wage_age$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
 
-#Intervalos de confianza
-#Definimos el intervalo de confianza del 95%
-z <- 1.96
 
-#Calcular los intervalos de confianza
-summ<-summ %>% mutate(ic_sup=yhat_reg_edad+(z*se))
-summ<-summ %>% mutate(ic_inf=yhat_reg_edad-(z*se))
+#Intervalos de confianza
+#Cálculos de intervalos de confianza
+conf_int<-boot.ci(boot.out=err_est_wage_age, type=c("norm"), conf=0.95) #cálculo de los intervalos de confianza boot
+conf_int
+
+#Extraemos los valores inferiores y superiores del intervalo de confianza
+ic_sup<-conf_int$normal[3]
+ic_inf<-conf_int$normal[2]
+ic_sup
+ic_inf
 
 #Graficas
 
-p3 <- ggplot(summ, aes(x=edad, y=yhat_reg_edad)) +
-  geom_point(col=4) +
-  geom_smooth(method=lm , formula= y~x+x^2, color=7, fill="#69b3a2", se=TRUE) +
-  theme_light()
-p3
 
-grafica <- ggplot(summ, aes(x = edad, y = yhat_reg_edad)) +
-  geom_line() + 
-  geom_ribbon(aes(ymin = ic_inf, ymax = ic_sup), alpha = 0.3) + #
-  labs(x = "Edad", y = "salario promedio")
+grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora)) +
+  geom_point(col=4, size=1) +
+  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)
 grafica
-
