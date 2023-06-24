@@ -8,9 +8,9 @@
 
 rm(list = ls()) # Limpiar Rstudio
 
-options(scipen = 20,  digits=5)
+options(scipen = 20,  digits=2)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -24,71 +24,66 @@ getwd()
 GEIH <- read_excel("../stores/GEIH")
 summary(GEIH)
 names(GEIH)
+GEIH<-GEIH %>% rename (mujer="sexo")
 
 # Question 3- Estimating the Age-wage profile profile--------
 
-
 #Model: log(w) = β1 + β2Age + β3Age2 + u
+reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=GEIH, weights=fex_c) #modelo general con factor de expansión
+reg_w_age_mujer<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==1, data=GEIH, weights=fex_c) #modelo para mujeres con factor de expansión
+reg_w_age_hombre<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==0, data=GEIH, weights=fex_c) #modelo para hombres con factor de expansión
 
-reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=PREGUNTA3)
-reg_w_age_mujer<-lm(formula=log_salario_hora~edad+edad2, subset=sexo==0, data=PREGUNTA3)
-reg_w_age_hombre<-lm(formula=log_salario_hora~edad+edad2, subset=sexo==1, data=PREGUNTA3)
+reg_w_age$AIC<-AIC(reg_w_age) #Akaike para modelo general
+reg_w_age_mujer$AIC<-AIC(reg_w_age_mujer) #Akaike para modelo mujeres
+reg_w_age_hombre$AIC<-AIC(reg_w_age_hombre) #Akaike para modelo hombres
 
-#reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=PREGUNTA3, weights=fex_c)
-#reg_w_age2<-lm(formula=logw~age+age2+ educ +sex +urbano+formal,data=PREGUNTA3, subset=sueldo_mens!=0,weights=fex_c)
-summary(reg_w_age)
+#Con los tres modelos
+stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"), 
+          dep.var.labels="Log(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage2.html",
+          add.lines=list(c("AIC", round(AIC(reg_w_age),1), round(AIC(reg_w_age_mujer),1), round(AIC(reg_w_age_hombre),1))))
 
-##AGREGAR MUJER Y HOMBRE EN TABLA- AIC BIC
-stargazer(reg_w_age,type="text",title="Tabla X: Resultado de la Regresión Salario-Edad", keep=c("edad","edad2"), 
-          dep.var.labels="Log(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq"), out="../views/age_wage1.html", add.lines=list(c('Variables de Control', 'No')))
+#Solo modelo principal
+stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"), 
+          dep.var.labels="Log(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage1.html",
+          add.lines=list(c("AIC", round(AIC(reg_w_age),1))))
 
+#Coeficientes del modelo principal
 coefs_w_age<-reg_w_age$coef
 b1_w_age<-coefs_w_age[1]
 b2_w_age<-coefs_w_age[2]
 b3_w_age<-coefs_w_age[3]
 
-edad_mean<-mean(PREGUNTA3$edad)
-edad_mea2<-mean(PREGUNTA3$edad2)
+edad_mean<-mean(GEIH$edad)
+edad_mea2<-mean(GEIH$edad2)
+
+#Coeficientes del modelo mujer
+coefs_w_age_mujer<-reg_w_age_mujer$coef
+b1_w_age_mujer<-coefs_w_age_mujer[1]
+b2_w_age_mujer<-coefs_w_age_mujer[2]
+b3_w_age_mujer<-coefs_w_age_mujer[3]
+
+#Coeficientes del modelo hombre
+coefs_w_age_hombre<-reg_w_age_hombre$coef
+b1_w_age_hombre<-coefs_w_age_hombre[1]
+b2_w_age_hombre<-coefs_w_age_hombre[2]
+b3_w_age_hombre<-coefs_w_age_hombre[3]
 
 #Predict yhat
-PREGUNTA3$yhat<-ifelse(PREGUNTA3$log_salario_hora2!=0, predict(reg_w_age), 0)
-#PREGUNTA3$yhat<-predict(reg_w_age2)
+GEIH$yhat<-ifelse(GEIH$log_salario_hora!=0, predict(reg_w_age), 0)
 
+#Cálculo edad donde se maximiza el salario
+edad_max<- (-b2_w_age/(2*b3_w_age)) #modelo general
+edad_max_mujer<- (-b2_w_age_mujer/(2*b3_w_age_mujer)) #modelo mujeres
+edad_max_hombre<- (-b2_w_age_hombre/(2*b3_w_age_hombre)) #modelo hombres
 
-#Model in sample fit #EXTRA
-summ_PREGUNTA3 <- PREGUNTA3 %>%  
-  group_by(
-    edad, edad2
-  ) %>%  
-  summarize(
-    mean_y = mean(log_salario_hora),
-    yhat_reg = mean(yhat), .groups="drop"
-  ) 
+resumen_edad_max <- data.frame(General=edad_max,
+                    Mujeres=edad_max_mujer,
+                    Hombres=edad_max_hombre)
+knitr::kable(resumen_edad_max, format = "rst", caption="Edad en pico de sueldo")
 
-ggplot(summ_PREGUNTA3) + 
-  geom_point(
-    aes(x = edad, y = mean_y),
-    color = "5", size = 2
-  ) + 
-  geom_line(
-    aes(x = edad, y = yhat_reg), 
-    color = "8", size = 1.5
-  ) + 
-  labs(
-    title = "Log Sueldo por Edad",
-    x = "Edad",
-    y = "Log Sueldos"
-  ) +
-  theme_bw()
+#Standard errors usando bootstrap
 
-#Model: log(w) = β1 + β2Age + β3Age2 + u
-#Prediction
-
-edad_max<- (-b2_w_age/(2*b3_w_age))
-edad_max
-
-#standard errors
-
+#Función para Bootstrap
 model_wage_age_fn<- function(data, index, edad_barra=mean(edad)) {
                     f<- lm(formula=log_salario_hora~edad+edad2, data, subset=index)
                     
@@ -100,9 +95,9 @@ model_wage_age_fn<- function(data, index, edad_barra=mean(edad)) {
                     return(edad_max_bt)
 }
 
-model_wage_age_fn(PREGUNTA3,1:nrow(PREGUNTA3))
+model_wage_age_fn(GEIH,1:nrow(GEIH))
 
-err_est_wage_age<-boot(PREGUNTA3,model_wage_age_fn,R=1000)
+err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
 err_est_wage_age
 
 g3 <- ggplot(db, aes(x=edad, y=predic2a)) + 
