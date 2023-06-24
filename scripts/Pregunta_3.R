@@ -163,5 +163,14 @@ ic_inf
 
 grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora)) +
   geom_point(col=4, size=1) +
-  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)
+  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1) +
+  geom_errorbar(aes(ymin = ic_inf, ymax = ic_sup), width = 0.2)
 grafica
+
+
+
+
+
+
+
+
