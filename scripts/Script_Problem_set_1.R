@@ -25,6 +25,7 @@ GEIH <- read_excel("../stores/GEIH")
 summary(GEIH)
 names(GEIH)
 GEIH<-GEIH %>% rename (mujer="sexo")
+GEIH<-GEIH[!is.na(GEIH$log_salario_hora),] #para poder correr todo el código
 
 # Question 3- Estimating the Age-wage profile profile--------
 
