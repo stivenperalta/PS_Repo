@@ -8,9 +8,9 @@
 
 rm(list = ls()) # Limpiar Rstudio
 
-options(scipen = 20,  digits=1)
+options(scipen = 20,  digits=3)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -78,31 +78,30 @@ reg_w_age<-lm(formula=log_salario_hora2~edad+edad2, data=GEIH, weights=fex_c)
 #reg_w_age2<-lm(formula=logw~age+age2+ educ +sex +urbano+formal,data=GEIH, subset=sueldo_mens!=0,weights=fex_c)
 summary(reg_w_age)
 
-coefs_w_age<-reg_w_age$coef
-b0_w_age<-coefs_w_age[1]
-b1_w_age<-coefs_w_age[2]
-b2_w_age<-coefs_w_age[3]
-
-age_mean<-mean(age)
-age_mea2<-mean(age2)
-
 stargazer(reg_w_age,type="text",title="Tabla X: Resultado de la Regresión Salario-Edad", keep=c("edad","edad2"), 
           dep.var.labels="Log(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq"), out="../views/age_wage1.html", add.lines=list(c('Variables de Control', 'No')))
 
+coefs_w_age<-reg_w_age$coef
+b1_w_age<-coefs_w_age[1]
+b2_w_age<-coefs_w_age[2]
+b3_w_age<-coefs_w_age[3]
+
+edad_mean<-mean(GEIH$edad)
+edad_mea2<-mean(GEIH$edad2)
+
+#Predict yhat
+GEIH$yhat<-ifelse(GEIH$log_salario_hora2!=0, predict(reg_w_age), 0)
+#GEIH$yhat<-predict(reg_w_age2)
 
 
-#Prediction
-GEIH$yhat1<-ifelse(GEIH$log_salario_hora2!=0, predict(reg_w_age), 0)
-#GEIH$yhat2<-ifelse(GEIH$log_salario_hora2!=0, predict(reg_w_age2), 0)
-
-
+#Model in sample fit
 summ_GEIH <- GEIH %>%  
   group_by(
     edad, edad2
   ) %>%  
   summarize(
     mean_y = mean(log_salario_hora2),
-    yhat_reg = mean(yhat1), .groups="drop"
+    yhat_reg = mean(yhat), .groups="drop"
   ) 
 
 ggplot(summ_GEIH) + 
@@ -121,7 +120,31 @@ ggplot(summ_GEIH) +
   ) +
   theme_bw()
 
+#ponemos medidas de ajuste? como aic bic c?
 
+#Model: log(w) = β1 + β2Age + β3Age2 + u
+#Prediction
+
+edad_max<- (-b2_w_age/(2*b3_w_age))
+edad_max
+
+#standard errors
+
+model_wage_age_fn<- function(data, index, edad_barra=mean(edad)) {
+                    f<- lm(formula=log_salario_hora2~edad+edad2, data, subset=index)
+                    
+                    coefs<-f$coefficients
+                    b2<-coefs[2]
+                    b3<-coefs[3]
+                    
+                    edad_max_bt<--(b2_w_age/(2*b3_w_age))
+                    return(edad_max_bt)
+}
+
+model_wage_age_fn(GEIH,1:nrow(GEIH))
+
+err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
+err_est_wage_age
 
 
 # Question 4: The gender earnings GAP -------------------------------------
