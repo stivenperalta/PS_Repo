@@ -160,15 +160,9 @@ ic_inf
 
 #Graficas
 
-p3 <- ggplot(summ, aes(x=edad, y=yhat_reg_edad)) +
-  geom_point(col=4) +
-  geom_smooth(method=lm , formula= y~x+x^2, color=7, fill="#69b3a2", se=TRUE) +
-  theme_light()
-p3
-
 grafica <- ggplot(summ, aes(x = edad, y = yhat_reg_edad)) +
   geom_line() + 
-  geom_ribbon(aes(ymin = ic_inf, ymax = ic_sup), alpha = 0.3) + #
+  geom_ribbon(aes(ymin = ic_inf, ymax = ic_sup), alpha = 0.2) + #
   labs(x = "Edad", y = "salario promedio")
 grafica
 
