@@ -71,10 +71,8 @@ b3_w_age_hombre<-coefs_w_age_hombre[3]
 
 #Predict yhat
 GEIH$yhat<-predict(reg_w_age)
-GEIH$yhat<-if(GEIH$mujer==0, predict(reg_w_age), 0)
-GEIH$yhat<-if(GEIH$hombre!=0, predict(reg_w_age), 0)
-
-
+GEIH$yhat_mujer<-ifelse(GEIH$mujer==1, predict(reg_w_age_mujer),0)
+GEIH$yhat_hombre<-ifelse(GEIH$mujer!=1, predict(reg_w_age_hombre),0)
 
 #Cálculo edad donde se maximiza el salario
 edad_max<- (-b2_w_age/(2*b3_w_age)) #modelo general
@@ -84,7 +82,7 @@ edad_max_hombre<- (-b2_w_age_hombre/(2*b3_w_age_hombre)) #modelo hombres
 resumen_edad_max <- data.frame(General=edad_max,
                     Mujeres=edad_max_mujer,
                     Hombres=edad_max_hombre)
-knitr::kable(resumen_edad_max, format = "rst", caption="Edad en pico de sueldo")
+knitr::kable(resumen_edad_max, format = "simple", caption="Edad en pico de sueldo")
 
 #Standard errors usando bootstrap
 
@@ -102,7 +100,7 @@ model_wage_age_fn<- function(data, index) {
 
 model_wage_age_fn(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo peak age en el modelo general
 
-err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=10000)
+err_est_wage_age<-boot(GEIH,model_wage_age_fn,R=1000)
 err_est_wage_age
 
 #Graficas
