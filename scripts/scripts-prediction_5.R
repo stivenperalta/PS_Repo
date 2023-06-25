@@ -156,7 +156,7 @@ ggsave(filename = "../views/distribucion de errores de prediccion.jpg", plot = d
 
 control <- trainControl(method = "LOOCV")
 modelo_LOOCV1 <- train(log_salario_hora_imputado ~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + edad * mujer, 
-                data = test, 
+                data = test, ## cambiar por base GEIH
                 method = "lm", 
                 trControl = control)
 
