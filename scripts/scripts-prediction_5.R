@@ -71,7 +71,7 @@ MSE_model3
 # especificacion 4: salario ~ mujer + edad + edad2 + educacion_tiempo + (interaccion entre edad y genero)
 model4<-lm(log_salario_hora_imputado ~ mujer + edad + edad2 + educacion_tiempo + mujer * edad,data=train)
 summary(model4)
-test$model4<-predict(model6,newdata = test)
+test$model4<-predict(model4,newdata = test)
 MSE_model4<-with(test,mean((log_salario_hora_imputado-model4)^2))
 MSE_model4
 
@@ -98,15 +98,27 @@ MSE_model7<-with(test,mean((log_salario_hora_imputado-model7)^2))
 MSE_model7
 
 #Se presentan las estimaciones de todos los modelos 
-stargazer(model1,model2,model3,model4,model5,model6,model7, summary = TRUE, type = "text")
+stargazer(model1, model2, model3, model4, model5, model6, model7, 
+          title = "Modelos Predictivos",
+          summary = TRUE, 
+          type = "text", 
+          out = "../views/modelos_predictivos.html",
+          omit.stat = c("f", "ser"),
+          omit = c("Constant", "R^2", "Adj. R^2"),
+          notes = c("Errores estándar en paréntesis")
+)
+
+
 
 #Los resultados de la predicci?n (MSE) de los modelos para los modelos previos y nuevos se condensan a continuaci?n:
 MSE_table<-c(MSE_model1, MSE_model2, MSE_model3, MSE_model4, MSE_model5,MSE_model6,MSE_model7)
 x_label<-c('Modelo 1','Modelo 2', 'Modelo 3', 'Modelo 4', 'Modelo 5','Modelo 6','Modelo 7')
 MSEtabla<-data.frame(Columna1 = x_label,Columna2 = MSE_table)
-dataframe <- data.frame(Columna1 = MSEtabla$Columna1, Columna2 = MSEtabla$Columna2)
-colnames(dataframe) <- c("Modelo", "MSE")
-print(dataframe)
+prediccion_errores <- data.frame(Columna1 = MSEtabla$Columna1, Columna2 = MSEtabla$Columna2)
+colnames(prediccion_errores) <- c("Modelo", "MSE")
+print(prediccion_errores)
+
+stargazer(prediccion_errores, summary = FALSE, title= "Tabla 5.2 Errores de prediccion", type = "text", out= "../views/errores de prediccion.html")
 
 #Ahora se grafican los MSE de cada uno de los modelos predichos para poder compararlos
 ggplot(data=MSEtabla, aes(x = x_label, y = MSE_table, group=1)) + 
@@ -146,6 +158,16 @@ distribucion_error <- ggplot(test) +
 
 # Guardar la gráfica en formato JPG
 ggsave(filename = "../views/distribucion de errores de prediccion.jpg", plot = distribucion_error, width = 6, height = 3, dpi = 300)
+
+
+cola_inferior <- test %>%
+  filter(error_prediccion_model6 < quantile(error_prediccion_model6, 0.05))
+cola_superior <- test %>%
+  filter(error_prediccion_model6 < quantile(error_prediccion_model6, 0.05))
+
+stargazer(data.frame(GEIH), header=FALSE, type='text',title="Variables en el Data Set")
+stargazer(data.frame(cola_inferior), header=FALSE, type='text',title="Variables en cola inferior")
+stargazer(data.frame(cola_superior), header=FALSE, type='text',title="Variables en cola superior")
 
 # De todos los modelos presentados, los que tienen un menor MSE son los modelos 6 y 7  Es decir, en donde se tiene un mejor performance en la prediccion. 
 # Sin embargo, los MSE son muy similares a los modelos lineales mas sencillos.
