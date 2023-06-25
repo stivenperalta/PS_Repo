@@ -16,27 +16,27 @@ getwd()
 # Import filtered data ----------------------------------------------------
 
 GEIH <- read_excel("../stores/GEIH") #ajustar ruta store
-summary(GEIH$log_salario_hora_imputado)
+summary(GEIH$log_salario_real_hora_imputado_imputado)
 names(GEIH)
 
 GEIH<-GEIH %>% rename (mujer="sexo")
-GEIH<-GEIH[!is.na(GEIH$log_salario_hora_imputado),] #para poder correr todo el código
+GEIH<-GEIH[!is.na(GEIH$log_salario_real_hora_imputado_imputado),] #para poder correr todo el código
 
 
 # Question 4: The gender earnings GAP -------------------------------------
 
 #Model1: log(w) = β1 + β2Female + u
 
-reg_w_fem<-lm(formula=log_salario_hora_imputado~mujer, data=GEIH) #modelo general
+reg_w_fem<-lm(formula=log_salario_real_hora_imputado_imputado~mujer, data=GEIH) #modelo general
 reg_w_fem$AIC<-AIC(reg_w_fem) #Akaike para modelo general
 
 
 #Modelo2: log(w) = β1 + β2Female + ocupacion + eduacion+ edad+ edad2 + u [usando FWL]
 
 GEIH<-GEIH %>% mutate(muj_res=lm(mujer~edad+edad2+educacion_tiempo+as.factor(ocupacion),GEIH)$residuals,#capturamos los residuales de mujer
-                      sal_res=lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(ocupacion),GEIH)$residuals) #capturamos los residuales del salario
+                      sal_res=lm(log_salario_real_hora_imputado_imputado~edad+edad2+educacion_tiempo+as.factor(ocupacion),GEIH)$residuals) #capturamos los residuales del salario
 
-reg_fwl1<-lm(sal_res~muj_res,GEIH) #el coeficiente de mujer debería salir igual que si lo corremos como lm(log_salario_hora~mujer+edad+edad2+educacion_tiempo+as.factor(ocupacion))
+reg_fwl1<-lm(sal_res~muj_res,GEIH) #el coeficiente de mujer debería salir igual que si lo corremos como lm(log_salario_real_hora_imputado~mujer+edad+edad2+educacion_tiempo+as.factor(ocupacion))
 
 #Con los dos modelos
 stargazer(reg_w_fem, reg_fwl1, type="text",title="Tabla 4.1: Regresión Salario-Female", 
