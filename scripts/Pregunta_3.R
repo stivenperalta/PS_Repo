@@ -29,6 +29,9 @@ GEIH<-GEIH[!is.na(GEIH$log_salario_hora),] #para poder correr todo el código
 
 # Question 3- Estimating the Age-wage profile profile--------
 
+
+# Models ------------------------------------------------------------------
+
 #Model: log(w) = β1 + β2Age + β3Age2 + u
 reg_w_age<-lm(formula=log_salario_hora~edad+edad2, data=GEIH) #modelo general
 reg_w_age_mujer<-lm(formula=log_salario_hora~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres
@@ -47,6 +50,9 @@ stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Tabla
 stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"), 
           dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage1.html",
           add.lines=list(c("AIC", round(AIC(reg_w_age),1))))
+
+
+# Coefficients ------------------------------------------------------------
 
 #Coeficientes del modelo principal
 coefs_w_age<-reg_w_age$coef
@@ -73,6 +79,9 @@ b3_w_age_hombre<-coefs_w_age_hombre[3]
 GEIH$yhat<-predict(reg_w_age)
 GEIH$yhat_mujer<-ifelse(GEIH$mujer==1, predict(reg_w_age_mujer),0)
 GEIH$yhat_hombre<-ifelse(GEIH$mujer!=1, predict(reg_w_age_hombre),0)
+
+
+# Age where salary is max -------------------------------------------------
 
 #Cálculo edad donde se maximiza el salario
 edad_max<- (-b2_w_age/(2*b3_w_age)) #modelo general
@@ -142,6 +151,9 @@ ggsave(
   dpi = 300,
 )
 
+
+# Bootstrap ---------------------------------------------------------------
+
 #Standard errors usando bootstrap
 
 #Función para Bootstrap
@@ -165,6 +177,8 @@ plot(err_est_wage_age) #para ver la distribución de los resultados de boot
 se<- apply(err_est_wage_age$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
 
 
+# Confidence Intervals ----------------------------------------------------
+
 #Intervalos de confianza
 #Cálculos de intervalos de confianza
 conf_int<-boot.ci(boot.out=err_est_wage_age, type=c("norm"), conf=0.95) #cálculo de los intervalos de confianza boot
@@ -178,7 +192,6 @@ ic_inf
 
 #Graficas
 
-
 grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora)) +
   geom_point(col=4, size=1) +
   geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)+
@@ -189,6 +202,8 @@ grafica
 #Exportamos la gráfica
 ggsave("../views/lnsalario_grafica.jpg", grafica, dpi = 300, width = 6, height = 4, units = "in")
 
+
+# Salaries Women/Men ------------------------------------------------------
 
 #Gráficas para hombres y mujeres
 
