@@ -4,7 +4,7 @@ rm(list = ls()) # Limpiar Rstudio
 
 options(scipen = 20,  digits=10)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr, readxl) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, openxlsx, knitr, readxl, kableExtra) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -86,9 +86,12 @@ tags<-c("Mujer","Std. Error")
 comparison.df<-format(data.frame(Modelo=tags,Regression=reg_muj,FWL=reg_fwl,FWL_BOOT=fwl_boot),digits=3)
 
 # Exportar la tabla
-ruta <- "../views/fwl_table.html" 
-fwl_boot <- kable(comparison.df, format = "html", align = "c", caption = "Comparación de Modelos") %>%
-cat(fwl_boot, file = ruta)
+ruta <- "../views/tabla_comp.html" 
+tabla_comp <- kable(comparison.df, format = "html", align = "c", caption = "Tabla 4.2: Comparación de Modelos") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  cat(tabla_comp, file = ruta)
+tabla_comp
+
 
 
 
