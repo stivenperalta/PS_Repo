@@ -22,7 +22,7 @@ getwd()
 # Import filtered data ----------------------------------------------------
 
 GEIH <- read_excel("../stores/GEIH")
-summary(GEIH$log_salario_real_hora_imputado)
+summary(GEIH$log_salario_hora_imputado)
 names(GEIH)
 summary(GEIH)
 # Question 3- Estimating the Age-wage profile profile--------
@@ -31,9 +31,9 @@ summary(GEIH)
 # Models ------------------------------------------------------------------
 
 #Model: log(w) = β1 + β2Age + β3Age2 + u
-reg_w_age<-lm(formula=log_salario_real_hora_imputado~edad+edad2, data=GEIH) #modelo general
-reg_w_age_mujer<-lm(formula=log_salario_real_hora_imputado~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres
-reg_w_age_hombre<-lm(formula=log_salario_real_hora_imputado~edad+edad2, subset=mujer==0, data=GEIH) #modelo para hombres
+reg_w_age<-lm(formula=log_salario_hora_imputado~edad+edad2, data=GEIH) #modelo general
+reg_w_age_mujer<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres
+reg_w_age_hombre<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==0, data=GEIH) #modelo para hombres
 
 reg_w_age$AIC<-AIC(reg_w_age) #Akaike para modelo general
 reg_w_age_mujer$AIC<-AIC(reg_w_age_mujer) #Akaike para modelo mujeres
@@ -97,7 +97,7 @@ summ <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredic
     edad, edad2
   ) %>%  
   summarize(
-    mean_y_edad = mean(log_salario_real_hora_imputado),
+    mean_y_edad = mean(log_salario_hora_imputado),
     yhat_reg_edad = mean(yhat), .groups="drop"
   ) 
 
@@ -106,7 +106,7 @@ summM <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredi
   filter(mujer==1) %>%
   group_by(edad, edad2) %>%  
   summarize(
-    mean_y_edad = mean(log_salario_real_hora_imputado),
+    mean_y_edad = mean(log_salario_hora_imputado),
     yhat_reg_edad = mean(yhat), .groups="drop"
   ) 
 
@@ -115,7 +115,7 @@ summH <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredi
   filter(mujer==0) %>%
   group_by(edad, edad2) %>%  
   summarize(
-    mean_y_edad = mean(log_salario_real_hora_imputado),
+    mean_y_edad = mean(log_salario_hora_imputado),
     yhat_reg_edad = mean(yhat), .groups="drop"
   ) 
 
@@ -130,7 +130,7 @@ grafico3_1<-ggplot(summ) +
     color = 7, size = 1.5
   ) + 
   labs(
-    title = "ln Salarios por Edad",
+    title = "Gráfico 3.1: ln Salarios por Edad",
     x = "Edad",
     y = "ln Salarios"
   ) +
@@ -156,7 +156,7 @@ ggsave(
 
 #Función para Bootstrap
 model_wage_age_fn<- function(data, index) {
-                    f<- lm(formula=log_salario_real_hora_imputado~edad+edad2, data, subset=index)
+                    f<- lm(formula=log_salario_hora_imputado~edad+edad2, data, subset=index)
                     
                     coefs<-f$coefficients
                     b2<-coefs[2]
@@ -190,10 +190,10 @@ ic_inf
 
 #Graficas
 
-grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_real_hora_imputado)) +
-  geom_point(col=4, size=1) +
+grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora_imputado)) +
+  geom_point(col=4, size=0.2) +
   geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)+
-  labs (x='Edad', y="ln Salario", title='Ln Salario por edad', subtitle='Hombres y Mujeres')
+  labs (x='Edad', y="ln Salario", title='Gráfico 3.2: Ln Salario por edad', subtitle='Hombres y Mujeres')
 
 grafica
 
