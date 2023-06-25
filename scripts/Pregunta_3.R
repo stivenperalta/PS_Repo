@@ -25,6 +25,7 @@ GEIH <- read_excel("../stores/GEIH")
 summary(GEIH$log_salario_hora_imputado)
 names(GEIH)
 summary(GEIH)
+
 # Question 3- Estimating the Age-wage profile profile--------
 
 
@@ -32,17 +33,17 @@ summary(GEIH)
 
 #Model: log(w) = β1 + β2Age + β3Age2 + u
 reg_w_age<-lm(formula=log_salario_hora_imputado~edad+edad2, data=GEIH) #modelo general
-reg_w_age_mujer<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres
-reg_w_age_hombre<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==0, data=GEIH) #modelo para hombres
+reg_w_age_mujer<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==1, data=GEIH) #modelo para mujeres con controles
+reg_w_age_hombre<-lm(formula=log_salario_hora_imputado~edad+edad2, subset=mujer==0, data=GEIH) #modelo para hombres con controles
 
 reg_w_age$AIC<-AIC(reg_w_age) #Akaike para modelo general
 reg_w_age_mujer$AIC<-AIC(reg_w_age_mujer) #Akaike para modelo mujeres
 reg_w_age_hombre$AIC<-AIC(reg_w_age_hombre) #Akaike para modelo hombres
 
 #Con los tres modelos
-stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"),
+stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Regresión Salario-Edad", keep=c("edad","edad2"),
           dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage2.html",
-          add.lines=list(c("AIC", round(AIC(reg_w_age),1), round(AIC(reg_w_age_mujer),1), round(AIC(reg_w_age_hombre),1))))
+          add.lines=list(c("AIC", round(AIC(reg_w_age),1), round(AIC(reg_w_age_mujer),1), round(AIC(reg_w_age_hombre),1)),c('Variables de Control', 'No','No','No')))
 
 #Solo modelo principal
 stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"),
@@ -86,10 +87,15 @@ edad_max<- (-b2_w_age/(2*b3_w_age)) #modelo general
 edad_max_mujer<- (-b2_w_age_mujer/(2*b3_w_age_mujer)) #modelo mujeres
 edad_max_hombre<- (-b2_w_age_hombre/(2*b3_w_age_hombre)) #modelo hombres
 
-resumen_edad_max <- data.frame(General=edad_max,
+resumen_edad_max <- format(data.frame(General=edad_max,
                     Mujeres=edad_max_mujer,
-                    Hombres=edad_max_hombre)
-knitr::kable(resumen_edad_max, format = "simple", caption="Edad en pico de sueldo")
+                    Hombres=edad_max_hombre), digits=3)
+
+tabla_edades<- kable(resumen_edad_max, format = "html", align = "c", caption = "Tabla 4.4: Comparación de Edades con pico de sueldo") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+cat(tabla_edades, file = "../views/tablas.edades.html")
+tabla_edades
+
 
 #Gráfica diferencia de ybarra y yhat
 summ <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredicho del modelo
@@ -213,8 +219,8 @@ colours<-c("Mujeres"="red", "Hombres"="blue")
 
 graficaMH <- ggplot() +
   geom_line(data = summ, aes(x = edad, y = yhat_mujer, color="Mujeres"), size=0.5)+
-  geom_line(data = summ, aes(x = edad, y = yhat_hombre, color="Hombres"), size=0.3)+
-  labs (x='Edad', y="ln Salario", color="Legend", title='Ln Salario por edad para Hombres y Mujeres')
+  geom_line(data = summ, aes(x = edad, y = yhat_hombre, color="Hombres"), size=0.5)+
+  labs (x='Edad', y="ln Salario", color="Legend", title='Gráfico 4.1: Ln Salario por edad para Hombres y Mujeres')
 graficaMH
 
 #Exportamos la gráfica
