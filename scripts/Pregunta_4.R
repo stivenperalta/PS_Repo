@@ -16,8 +16,9 @@ getwd()
 # Import filtered data ----------------------------------------------------
 
 GEIH <- read_excel("../stores/GEIH") #ajustar ruta store
-summary(GEIH$relacion_laboral)
+summary(GEIH)
 GEIH$relacion_laboral[is.na(GEIH$relacion_laboral)]<-9 #reemplazamos los missings por 9
+GEIH$tamaño_empresa[is.na(GEIH$tamaño_empresa)]<-1
 names(GEIH)
 
 # Question 4: The gender earnings GAP -------------------------------------
@@ -36,16 +37,15 @@ GEIH<-GEIH %>% mutate(muj_res=lm(mujer~edad+edad2+educacion_tiempo+as.factor(rel
 reg_fwl1<-lm(sal_res~muj_res,GEIH) #el coeficiente de mujer debería salir igual que si lo corremos como lm(log_salario_hora_imputado~mujer+edad+edad2+educacion_tiempo+as.factor(relacion_laboral))
 
 #Con los dos modelos
-stargazer(reg_w_fem, reg_fwl1, type="text",title="Tabla 4.1: Regresión Salario-Female", 
+stargazer(reg_w_fem, reg_fwl1, type="text",title="Tabla 4.1: Regresión Salario-Mujer", 
           dep.var.labels=c("Ln(salario)","Ln(salario)"),covariate.labels=c("Mujer","Mujer FWL"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_fem.html",
-          add.lines=list(c("AIC", round(AIC(reg_w_fem),1), round(AIC(reg_fwl1),1),'Variables de Control', 'No','Si')), notes="El modelo FWL (2) ha sido calculado con las variable de control edad, educación, y ocupación.", notes.align="l")
-
-####AGREGAR una linea mas para poner variables de control
-
-
+          add.lines=list(c("AIC", round(AIC(reg_w_fem),1), round(AIC(reg_fwl1),1)),c('Variables de Control', 'No','Si')), 
+          notes=c("El modelo FWL (2) ha sido calculado con las variable de control", 
+          "edad, educación, ocupación y tamaño de la empresa."), notes.align="c")
 
 #Utilizamos bootstrap para calcular los coeficientes y errores estándares
 
+set.seed(12345)
 #Función para Bootstrap
 model_fwl_boot<- function(data, index) {
   f<- lm(formula=sal_res~muj_res, data, subset=index)
