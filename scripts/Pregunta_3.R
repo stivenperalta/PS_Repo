@@ -130,7 +130,7 @@ grafico3_1<-ggplot(summ) +
     color = 7, size = 1.5
   ) + 
   labs(
-    title = "Gráfico 3.1: ln Salarios por Edad",
+    title = "Gráfico 3.1: ln Salarios promedio por Edad",
     x = "Edad",
     y = "ln Salarios"
   ) +
