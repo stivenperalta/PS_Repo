@@ -191,6 +191,41 @@ stargazer(data.frame(cola_superior), header=FALSE, type='text',title="Variables 
 
 
 ###############################################################################
+
+### LOOCV para el modelo con mejor performance predictivo, es decir, model 6
+
+control <- trainControl(method = "LOOCV")
+modelo_LOOCV1 <- train(log_salario_hora_imputado ~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + edad * mujer, 
+                       data = test, ## cambiar por base GEIH
+                       method = "lm", 
+                       trControl = control)
+
+# Resumen del modelo
+LOOCV1 <- summary(modelo_LOOCV1)
+
+# Obtener los coeficientes y estadísticas del modelo
+coeficientes_loocv <- coef(modelo_LOOCV1$finalModel)
+estadisticas_loocv <- summary(modelo_LOOCV1$finalModel)$coefficients[, c("Estimate", "Std. Error", "t value", "Pr(>|t|)")]
+
+# Crear un tibble con los resultados
+Resultados_LOOCV <- as_tibble(estadisticas_loocv)
+Resultados_LOOCV$Variable <- rownames(estadisticas_loocv)
+
+# Cambiar los nombres y orden de las columnas
+colnames(Resultados_LOOCV) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)", "Variable")
+Resultados_LOOCV <- dplyr::select(resultados, Variable, Estimate, `Std. Error`, `t value`, `Pr(>|t|)`)
+
+#exportar resultados de regresion
+stargazer(Resultados_LOOCV, summary = FALSE, type = "text", out= "../views/modelo_LOOCV1.html")
+
+#calculamos el RMSE para comparar con los de la validación cruzada
+RMSE_modelLOOCV<-modelo_LOOCV$results
+RMSE_modelLOOCV<-RMSE_modelLOOCV$RMSE
+RMSE_modelLOOCV<-mean(RMSE_modelLOOCV)
+
+view(RMSE_modelLOOCV)
+
+###############################################################################
 # LOOCV para el segundo mejor modelo de performance predictivo, es decir, model 6
 #install.packages("caret")
 #library(caret)
