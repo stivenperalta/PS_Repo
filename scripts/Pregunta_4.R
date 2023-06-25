@@ -23,10 +23,17 @@ names(GEIH)
 
 # Question 4: The gender earnings GAP -------------------------------------
 
+
+# Model 1 -----------------------------------------------------------------
+
+
 #Model1: log(w) = β1 + β2Female + u
 
 reg_w_fem<-lm(formula=log_salario_hora_imputado~mujer, data=GEIH) #modelo general
 reg_w_fem$AIC<-AIC(reg_w_fem) #Akaike para modelo general
+
+
+# Model 2: FWL ------------------------------------------------------------
 
 #Modelo2: log(w) = β1 + β2Female + relacion_laboral + eduacion+ edad+ edad2 + tamaño empresa + u [usando FWL]
 
@@ -40,6 +47,8 @@ lm(log_salario_hora_imputado~mujer+edad+edad2+educacion_tiempo+as.factor(relacio
 reg_fwl1
 
 
+
+# Results table -----------------------------------------------------------
 #Con los dos modelos
 stargazer(reg_w_fem, reg_fwl1, type="text",title="Tabla 4.1: Regresión Salario-Mujer", 
           dep.var.labels=c("Ln(salario)","Ln(salario)"),covariate.labels=c("Mujer","Mujer FWL"), omit.stat=c("ser","f","adj.rsq","aic"), 
@@ -48,8 +57,10 @@ stargazer(reg_w_fem, reg_fwl1, type="text",title="Tabla 4.1: Regresión Salario-
           notes=c("El modelo FWL (2) ha sido calculado con las variable de control", 
           "edad, educación, ocupación y tamaño de la empresa."), notes.align="c")
 
-#Utilizamos bootstrap para calcular los coeficientes y errores estándares
 
+# Model 3: Bootstrap and FWL ----------------------------------------------
+
+#Utilizamos bootstrap para calcular los coeficientes y errores estándares
 #Función para Bootstrap
 model_fwl_boot<- function(data, index) {
   f<- lm(formula=sal_res~muj_res, data, subset=index)
@@ -66,6 +77,8 @@ model_fwl_boot(GEIH,1:nrow(GEIH)) #para verificar que nos de el mismo coeficient
 err_est_fwl_boot<-boot(GEIH,model_fwl_boot,R=1000)
 err_est_fwl_boot
 
+
+# Extracting Coefficients -------------------------------------------------
 # Extraemos el coeficiente b2 y el error estándard
 t1_stat <- err_est_fwl_boot$t0
 se_t1 <- sd(err_est_fwl_boot$t)
