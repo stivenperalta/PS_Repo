@@ -90,9 +90,10 @@ resumen_edad_max <- format(data.frame(General=edad_max,
                     Mujeres=edad_max_mujer,
                     Hombres=edad_max_hombre), digits=3)
 
+path1<-"../views/tabla_edades.html"
 tabla_edades <- kable(resumen_edad_max, format = "html", align = "c", caption = "Edades pico en salario sin controles") %>%
                 kable_classic(full_width = F, html_font = "Cambria") %>%
-                cat(tabla_edades, file = "../views/tabla_edades.html")
+                cat(resumen_edad_max, file = path1)
 tabla_edades
 
 #Gráfica diferencia de ybarra y yhat
