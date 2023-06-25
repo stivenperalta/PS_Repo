@@ -14,39 +14,31 @@ setwd(path_folder)
 getwd()
 
 # Import filtered data ----------------------------------------------------
-
 GEIH <- read_excel("../stores/GEIH") #ajustar ruta store
 summary(GEIH)
-GEIH$relacion_laboral[is.na(GEIH$relacion_laboral)]<-9 #reemplazamos los missings por 9
-GEIH<-GEIH[complete.cases(GEIH[,c("tamaño_empresa")]),] #imputamos las personas sin información del tamaño de la empresa
 names(GEIH)
 
 # Question 4: The gender earnings GAP -------------------------------------
 
 
 # Model 1 -----------------------------------------------------------------
-
-
 #Model1: log(w) = β1 + β2Female + u
 
 reg_w_fem<-lm(formula=log_salario_hora_imputado~mujer, data=GEIH) #modelo general
 reg_w_fem$AIC<-AIC(reg_w_fem) #Akaike para modelo general
 
-
 # Model 2: FWL ------------------------------------------------------------
 
 #Modelo2: log(w) = β1 + β2Female + relacion_laboral + eduacion+ edad+ edad2 + tamaño empresa + u [usando FWL]
 
-GEIH<-GEIH %>% mutate(muj_res=lm(mujer~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa),GEIH)$residuals,#capturamos los residuales de mujer
-                      sal_res=lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+tamaño_empresa,GEIH)$residuals) #capturamos los residuales del salario
+GEIH<-GEIH %>% mutate(muj_res=lm(mujer~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa),na.omit(GEIH))$residuals,#capturamos los residuales de mujer
+                      sal_res=lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa),na.omit(GEIH))$residuals) #capturamos los residuales del salario
 
 reg_fwl1<-lm(sal_res~muj_res,GEIH) #el coeficiente de mujer debería salir igual que si lo corremos como lm(log_salario_hora_imputado~mujer+edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa))
 
 #probamos para ver si sale el mismo coeficiente
 lm(log_salario_hora_imputado~mujer+edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa),GEIH)
 reg_fwl1
-
-
 
 # Results table -----------------------------------------------------------
 #Con los dos modelos
@@ -105,6 +97,9 @@ tabla_comp <- kable(comparison.df, format = "html", align = "c", caption = "Tabl
   cat(tabla_comp, file = ruta)
 tabla_comp
 
+
+
+# Peak salaries by gender with controls -----------------------------------
 
 
 
