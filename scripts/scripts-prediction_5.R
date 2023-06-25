@@ -213,7 +213,7 @@ Resultados_LOOCV$Variable <- rownames(estadisticas_loocv)
 
 # Cambiar los nombres y orden de las columnas
 colnames(Resultados_LOOCV) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)", "Variable")
-Resultados_LOOCV <- dplyr::select(resultados, Variable, Estimate, `Std. Error`, `t value`, `Pr(>|t|)`)
+Resultados_LOOCV <- dplyr::select(Resultados_LOOCV, Variable, Estimate, `Std. Error`, `t value`, `Pr(>|t|)`)
 
 #exportar resultados de regresion
 stargazer(Resultados_LOOCV, summary = FALSE, type = "text", out= "../views/modelo_LOOCV1.html")
@@ -249,7 +249,7 @@ Resultados_LOOCV2$Variable <- rownames(estadisticas_loocv2)
 
 # Cambiar los nombres y orden de las columnas
 colnames(Resultados_LOOCV2) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)", "Variable")
-Resultados_LOOCV2 <- dplyr::select(resultados, Variable, Estimate, `Std. Error`, `t value`, `Pr(>|t|)`)
+Resultados_LOOCV2 <- dplyr::select(Resultados_LOOCV2, Variable, Estimate, `Std. Error`, `t value`, `Pr(>|t|)`)
 
 #exportar resultados de regresion
 stargazer(Resultados_LOOCV2, summary = FALSE, type = "text", out= "../views/modelo_LOOCV1.html")
