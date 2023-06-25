@@ -101,6 +101,79 @@ tabla_comp
 
 # Peak salaries by gender with controls -----------------------------------
 
+# Models ------------------------------------------------------------------
+
+#Model: log(w) = β1 + β2Age + β3Age2 + u
+reg_mh<-lm(formula=log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa), data=GEIH) #modelo general con controles
+reg_m<-lm(formula=log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa), subset=mujer==1, data=GEIH) #modelo para mujeres con controles
+reg_h<-lm(formula=log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa), subset=mujer==0, data=GEIH) #modelo para hombres con controles
+
+reg_mh$AIC<-AIC(reg_mh) #Akaike para modelo general
+reg_m$AIC<-AIC(reg_m) #Akaike para modelo mujeres
+reg_h$AIC<-AIC(reg_h) #Akaike para modelo hombres
+
+#Con los tres modelos
+stargazer(reg_mh, reg_m, reg_h, type="text",title="Tabla 4.4: Regresión Salario-Genero", keep=c("mujer","edad","edad2"),
+          dep.var.labels="Ln(salario)",covariate.labels=c("Mujer","Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/salario_ge.html",
+          add.lines=list(c("AIC", round(AIC(reg_mh),1), round(AIC(reg_m),1), round(AIC(reg_h),1)),c('Variables de Control', 'Si','Si','Si')),
+          notes=c("Las variable de control empleadas son educación,", 
+                  "ocupación y tamaño de la empresa."), notes.align="c")
+
+# Coefficients ------------------------------------------------------------
+
+#Coeficientes del modelo principal
+coefs_mh<-reg_mh$coef
+b1_mh<-coefs_mh[1]
+b2_mh<-coefs_mh[2]
+b3_mh<-coefs_mh[3]
+
+#Coeficientes del modelo mujer
+coefs_m<-reg_m$coef
+b1_m<-coefs_m[1]
+b2_m<-coefs_m[2]
+b3_m<-coefs_m[3]
+
+#Coeficientes del modelo hombre
+coefs_h<-reg_h$coef
+b1_h<-coefs_h[1]
+b2_h<-coefs_h[2]
+b3_h<-coefs_h[3]
+
+# Age where salary is max -------------------------------------------------
+
+#Cálculo edad donde se maximiza el salario
+edad_mh<- (-b2_mh/(2*b3_mh)) #modelo general
+edad_m<- (-b2_m/(2*b3_m)) #modelo mujeres
+edad_h<- (-b2_h/(2*b3_h)) #modelo hombres
+
+resumen_edad_cc <- format(data.frame(General=edad_mh,
+                                     Mujeres=edad_m,
+                                     Hombres=edad_h), digits=3)
+
+path2<-"../views/tabla_edadescc.html"
+tabla_edades_cc <- kable(resumen_edad_cc, format = "html", align = "c", caption = "Edades pico en salario con controles") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  cat(resumen_edad_cc, file = path2 )
+tabla_edades_cc
+
+#Gráficas para hombres y mujeres con controles
+
+#sacamos los yhat para cada x para mujeres y hombres (por separado)
+gcc<-data.frame(Edad=18:99)
+
+gcc<-gcc %>% mutate(yhat_mujer=b1_m+b2_m*Edad+b3_m*Edad^2, #yhat para mujeres
+                    yhat_hombre=b1_h+b2_h*Edad+b3_h*Edad^2) #capturamos los residuales del salario
+
+colours<-c("Mujeres"="red", "Hombres"="blue")
+
+graficaMHCC <- ggplot() +
+  geom_line(data = gcc, aes(x = Edad, y = yhat_mujer, color="Mujeres"), size=0.5)+
+  geom_line(data = gcc, aes(x = Edad, y = yhat_hombre, color="Hombres"), size=0.5)+
+  labs (x='Edad', y="ln Salario", color="Legend", title='Gráfico 4.2: Salario por edad con controles')
+graficaMHCC
+
+#Exportamos la gráfica
+ggsave("../views/lnsalario_mujer_vs_hombreCC.jpg", graficaMHCC, dpi = 300, width = 6, height = 4, units = "in")
 
 
 
