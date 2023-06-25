@@ -94,6 +94,24 @@ summ <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredic
     yhat_reg_edad = mean(yhat), .groups="drop"
   ) 
 
+  #Para Mujeres
+summM <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredicho del modelo
+  filter(mujer==1) %>%
+  group_by(edad, edad2) %>%  
+  summarize(
+    mean_y_edad = mean(log_salario_hora),
+    yhat_reg_edad = mean(yhat), .groups="drop"
+  ) 
+
+  #Para Hombres
+summH <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredicho del modelo
+  filter(mujer==0) %>%
+  group_by(edad, edad2) %>%  
+  summarize(
+    mean_y_edad = mean(log_salario_hora),
+    yhat_reg_edad = mean(yhat), .groups="drop"
+  ) 
+
 #Creamos la gráfica y la grabamos como un dato separado
 grafico3_1<-ggplot(summ) + 
   geom_point(
@@ -163,13 +181,31 @@ ic_inf
 
 grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora)) +
   geom_point(col=4, size=1) +
-  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1) +
-  geom_errorbar(aes(ymin = ic_inf, ymax = ic_sup), width = 0.2)
+  geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)+
+  labs (x='Edad', y="ln Salario", title='Ln Salario por edad', subtitle='Hombres y Mujeres')
+
 grafica
 
+#Exportamos la gráfica
+ggsave("../views/lnsalario_grafica.jpg", grafica, dpi = 300, width = 6, height = 4, units = "in")
 
 
+#Gráficas para hombres y mujeres
 
+#sacamos los yhat para cada x para mujeres y hombres (por separado)
+summ<-summ %>% mutate(yhat_mujer=b1_w_age_mujer+b2_w_age_mujer*edad+b3_w_age_mujer*edad^2, #yhat para mujeres
+                      yhat_hombre=b1_w_age_hombre+b2_w_age_hombre*edad+b3_w_age_hombre*edad^2) #capturamos los residuales del salario
+
+colours<-c("Mujeres"="red", "Hombres"="blue")
+
+graficaMH <- ggplot() +
+  geom_line(data = summ, aes(x = edad, y = yhat_mujer, color="Mujeres"), size=0.5)+
+  geom_line(data = summ, aes(x = edad, y = yhat_hombre, color="Hombres"), size=0.3)+
+  labs (x='Edad', y="ln Salario", color="Legend", title='Ln Salario por edad para Hombres y Mujeres')
+graficaMH
+
+#Exportamos la gráfica
+ggsave("../views/lnsalario_mujer_vs_hombre.jpg", graficaMH, dpi = 300, width = 6, height = 4, units = "in")
 
 
 
