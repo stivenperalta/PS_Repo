@@ -40,12 +40,12 @@ reg_w_age_mujer$AIC<-AIC(reg_w_age_mujer) #Akaike para modelo mujeres
 reg_w_age_hombre$AIC<-AIC(reg_w_age_hombre) #Akaike para modelo hombres
 
 #Con los tres modelos
-stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"), 
+stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"),
           dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage2.html",
           add.lines=list(c("AIC", round(AIC(reg_w_age),1), round(AIC(reg_w_age_mujer),1), round(AIC(reg_w_age_hombre),1))))
 
 #Solo modelo principal
-stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"), 
+stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"),
           dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage1.html",
           add.lines=list(c("AIC", round(AIC(reg_w_age),1))))
 
