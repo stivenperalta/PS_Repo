@@ -20,7 +20,7 @@ GEIH <- read_excel("../stores/GEIH")
 #pero antes vamos a convertir algunas variables a categóricas y crear variables para la especificación de modelos con variable sno lineales:
 
 GEIH$estrato <- factor(GEIH$estrato)
-GEIH$ocupacion <- factor(GEIH$ocupacion)
+GEIH$relacion_laboral <- factor(GEIH$relacion_laboral)
 GEIH <- GEIH %>%
   filter(!is.na(salario_real_hora_imputado)) %>%
   mutate(educacion_tiempo2 = educacion_tiempo^2,
@@ -45,54 +45,55 @@ train  <- GEIH[sample, ]
 test   <- GEIH[!sample, ] 
 
 ###############################################################################
-#   Especificacion de modelos
+#   Especificación de modelos
 ##############################################################################
 
-# especificacion 1: salario ~ edad + edad2
+# especificación 1: salario ~ edad + edad2
 model1<-lm(log_salario_hora_imputado~edad + edad2,data=train)
 summary(model1)
 test$model1<-predict(model1,newdata = test)
 MSE_model1<-with(test,mean((log_salario_hora_imputado-model1)^2))
 MSE_model1
 
-# especificacion 2: salario ~ mujer + edad + edad2 + educacion_tiempo + ocupacion
-model2<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo + as.factor(ocupacion),data=train)
+# especificación 2: salario ~ mujer 
+model2<-lm(log_salario_hora_imputado~mujer,data=train)
 summary(model2)
 test$model2<-predict(model2,newdata = test)
 MSE_model2<-with(test,mean((log_salario_hora_imputado-model2)^2))
 MSE_model2
 
-# especificacion 3: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato 
-model3<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo + estrato,data=train)
+# especificación 3: salario ~ mujer+edad2+educacion_tiempo+relacion_laboral+tamaño_empresa
+
+model3<-lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+tamaño_empresa,data=train)
 summary(model3)
 test$model3<-predict(model3,newdata = test)
 MSE_model3<-with(test,mean((log_salario_hora_imputado-model3)^2))
 MSE_model3
 
-# especificacion 4: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato + estrato2
-model4<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo  + estrato + estrato2,data=train)
+# especificación 4: salario ~ mujer + edad + edad2 + educacion_tiempo + relación laboral
+model4<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo + as.facto(relacion_laboral),data=train)
 summary(model4)
-test$model5<-predict(model4,newdata = test)
-MSE_model4<-with(test,mean((log_salario_hora_imputado-model5)^2))
+test$model4<-predict(model4,newdata = test)
+MSE_model4<-with(test,mean((log_salario_hora_imputado-model4)^2))
 MSE_model4
 
-# especificacion 5: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato + (mujer*edad)
-model5<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo  + estrato + mujer * edad,data=train)
+# especificacion 5: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato + (Interacción entre edad y género) 
+model5<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo  + estrato + edad * mujer,data=train)
 summary(model5)
 test$model5<-predict(model5,newdata = test)
-with(test,mean((log_salario_hora_imputado-model5)^2))
 MSE_model5<-with(test,mean((log_salario_hora_imputado-model5)^2))
 MSE_model5
 
-# especificacion 6: salario ~ mujer + edad + edad2 + educacion_tiempo + educacion_tiempo2 + ocupacion
-model6<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo + educacion_tiempo2 + as.factor(ocupacion),data=train)
+# especificacion 6: salario ~ mujer + edad + edad2 + educacion_tiempo  + (quitando estrato y dejando interacción entre edad y género)
+model6<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo + mujer * edad,data=train)
 summary(model6)
 test$model6<-predict(model6,newdata = test)
+with(test,mean((log_salario_hora_imputado-model6)^2))
 MSE_model6<-with(test,mean((log_salario_hora_imputado-model6)^2))
 MSE_model6
 
-# especificacion 7: salario ~ mujer + edad + edad2 + edad3 + educacion_tiempo  + estrato + estrato2
-model7<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + edad3 + educacion_tiempo  + estrato + estrato2,data=train)
+# especificacion 7: salario ~ mujer + edad +  educacion_tiempo (Interacción entre edad y género, quitando edad^2)
+model7<-lm(log_salario_hora_imputado~ mujer + edad + educacion_tiempo + edad * mujer,data=train)
 summary(model7)
 test$model7<-predict(model7,newdata = test)
 MSE_model7<-with(test,mean((log_salario_hora_imputado-model7)^2))
@@ -120,5 +121,84 @@ ggplot(data=MSEtabla, aes(x = x_label, y = MSE_table, group=1)) +
 #Posteriormente, para tener idea de cuáles modelos tienen el MSE más bajo
 ordenMSE <- dataframe[order(dataframe$MSE), ]
 View(ordenMSE)
+
+# De todos los modelos presentados, los que tienen un menor MSE son los modelos nuevos X  Es decir, en donde se tiene un mejor performance en la predicción. 
+# Sin embargo, los MSE son muy similares a los de los demás modelos, especialmente el modelo previo X a y los nuevos X, X y X. 
+
+# Apalancamiento
+install.packages("caret")
+
+alpha <- c()
+u <- c()
+h <- c()
+
+#El modelo con menor error cuadrático medio se calcula nuevamente #Aquí dependiendo de lo que nos de en los modelos se debe estimar nuevamente
+bestmodel<-lm(lningresoh ~ sex + age + age2 + educ + lnexperp + relab + estrato1, data = test_data)
+
+#Calcular el leverage para el modelo con el menor MSE
+alphass <- c()
+for (j in 1:nrow(test_data)) {
+  u_j <- bestmodel$residual[j]
+  h_j <- lm.influence(bestmodel)$hat[j]
+  alpha <- u_j/(1-h_j)
+  alphass <- c(alphass, alpha)
+} 
+
+
+
+#Teniendo en cuenta que es posible que un leverage mayor a 1 o menor que -1 se podría considerar alto, se calcula lo siguiente:
+alphass<-data.frame(alphass)
+leverage<-alphass[alphass$alphass>=1|alphass<=-1,]
+leverage<-data.frame(leverage)
+lvpercentage<-((nrow(leverage)/nrow(alphass)*100))
+xlabel_alpha<-1:nrow(test_data)
+xlabel_alpha<-data.frame(xlabel_alpha)
+alphass<-cbind(alphass, xlabel_alpha)
+view(lvpercentage)
+
+# Se grafican los resultados obtenidos
+ggplot(data=alphass, aes(x = xlabel_alpha, y = alphass, group=1)) + 
+  geom_point() + 
+  ggtitle("Leverage para el modelo con mejor métrica de MSE")
+
+#Se consultan los valores máximos y mínimos
+max(alphass$alphass)
+min(alphass$alphass)
+
+
+# LOOCV para el modelo con mejor performance predictivo, es decir, el mnX (FALTA DEFINIRLO)
+GEIHSO$lnexperp <- log(GEIHSO$experp)
+
+modelLOOCV1 <- train(lningresoh ~ sex + age + age2 + educ + lnexperp + relab + estrato1, 
+                     data = GEIHSO,
+                     method = "lm",
+                     trControl = trainControl(method = "LOOCV"))
+
+# Resultados 
+modelLOOCV1
+
+RMSE_modelLOOCV1<-modelLOOCV1$results
+RMSE_modelLOOCV1<-RMSE_modelLOOCV1$RMSE
+RMSE_modelLOOCV1<-mean(RMSE_modelLOOCV1)
+
+view(RMSE_modelLOOCV1)
+# 0.6448116
+
+# LOOCV para el segundo modelo con mejor performance predictivo, es decir, el mn3 (FALTA DEFINIRLO)
+modelLOOCV2 <- train(lningresoh ~ sex + age + educ + experp + I(experp^2) + relab + estrato1, 
+                     data = GEIHSO,
+                     method = "lm",
+                     trControl = trainControl(method = "LOOCV"))
+
+# Resultados 
+modelLOOCV2
+
+RMSE_modelLOOCV2<-modelLOOCV2$results
+RMSE_modelLOOCV2<-RMSE_modelLOOCV2$RMSE
+RMSE_modelLOOCV2<-mean(RMSE_modelLOOCV2)
+
+view(RMSE_modelLOOCV2)
+# 0.6469727
+
 
 
