@@ -10,7 +10,7 @@ rm(list = ls()) # Limpiar Rstudio
 
 options(scipen = 20,  digits=10)
 require(pacman)
-p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, readxl, knitr) # Cargar varios paquetes al tiempo
+p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, rstudioapi, stargazer, boot, readxl, knitr, kableExtra) # Cargar varios paquetes al tiempo
 
 
 #Definir el directorio
@@ -22,7 +22,6 @@ getwd()
 # Import filtered data ----------------------------------------------------
 
 GEIH <- read_excel("../stores/GEIH")
-summary(GEIH$log_salario_hora_imputado)
 names(GEIH)
 summary(GEIH)
 
@@ -91,11 +90,10 @@ resumen_edad_max <- format(data.frame(General=edad_max,
                     Mujeres=edad_max_mujer,
                     Hombres=edad_max_hombre), digits=3)
 
-tabla_edades<- kable(resumen_edad_max, format = "html", align = "c", caption = "Tabla 4.4: Comparación de Edades con pico de sueldo") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-cat(tabla_edades, file = "../views/tablas.edades.html")
+tabla_edades <- kable(resumen_edad_max, format = "html", align = "c", caption = "Edades pico en salario sin controles") %>%
+                kable_classic(full_width = F, html_font = "Cambria") %>%
+                cat(tabla_edades, file = "../views/tabla_edades.html")
 tabla_edades
-
 
 #Gráfica diferencia de ybarra y yhat
 summ <- GEIH %>%  #agrupamos los datos por edad y se calcula el ybarra y ypredicho del modelo
@@ -220,7 +218,7 @@ colours<-c("Mujeres"="red", "Hombres"="blue")
 graficaMH <- ggplot() +
   geom_line(data = summ, aes(x = edad, y = yhat_mujer, color="Mujeres"), size=0.5)+
   geom_line(data = summ, aes(x = edad, y = yhat_hombre, color="Hombres"), size=0.5)+
-  labs (x='Edad', y="ln Salario", color="Legend", title='Gráfico 4.1: Ln Salario por edad para Hombres y Mujeres')
+  labs (x='Edad', y="ln Salario", color="Legend", title='Gráfico 4.1: Salario por edad sin controles')
 graficaMH
 
 #Exportamos la gráfica
