@@ -16,10 +16,10 @@ Entre los principales resultados se encontró en general que, variables como la 
 
 Los archivos en este repositorio están contenidos en las siguientes carpetas:
 
-- `document`: Contiene los documentos revisados para el desarrollo del trabajo, incluyendo el [documento final](document/Taller_1.pdf) del trabajo.
+- `document`: Contiene los documentos revisados para el desarrollo del trabajo, incluyendo el [documento final](document/Taller_1_problem_set_1.pdf) del trabajo.
 - `scripts`: Contiene todos los scripts en R para el desarrollo del trabajo.
 - `stores`: Contiene los data sets usados para el trabajo, corresponde a información de la GEIH-2018 extraída por web scrapping.
-- `views`: Contiene todas las imágenes y tablas generadas, las cuales se incluyen en el [documento final](document/Taller_1.pdf) del trabajo.
+- `views`: Contiene todas las imágenes y tablas generadas, las cuales se incluyen en el [documento final](document/Taller_1_problem_set_1.pdf) del trabajo.
 
 
 ### Integrantes
