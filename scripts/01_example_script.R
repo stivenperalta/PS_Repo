@@ -21,7 +21,7 @@ rm(pkg)
 
 # Load data ---------------------------------------------------------------
 # I recomend you using the package here
-dta<-read.table(here("stores","US90.txt"), sep="", header=TRUE)
+dta<-read.table(here("stores","US90.t xt"), sep="", header=TRUE)
 
 
 # plot data ---------------------------------------------------------------
