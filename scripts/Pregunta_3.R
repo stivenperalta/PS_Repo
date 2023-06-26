@@ -46,8 +46,7 @@ stargazer(reg_w_age, reg_w_age_mujer, reg_w_age_hombre, type="text",title="Regre
 
 #Solo modelo principal
 stargazer(reg_w_age,type="text",title="Tabla 3.1: Regresión Salario-Edad", keep=c("edad","edad2"),
-          dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage1.html",
-          add.lines=list(c("AIC", round(AIC(reg_w_age),1))))
+          dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/age_wage1.html")
 
 
 # Coefficients ------------------------------------------------------------
@@ -134,6 +133,8 @@ grafico3_1<-ggplot(summ) +
     aes(x = edad, y = yhat_reg_edad), 
     color = 7, size = 1.5
   ) + 
+  geom_ribbon(aes(ymin= lwr, ymax=upr), fill="gray", alpha=0.5
+  ) +
   labs(
     title = "Gráfico 3.1: ln Salarios promedio por Edad",
     x = "Edad",
@@ -188,8 +189,8 @@ conf_int<-boot.ci(boot.out=err_est_wage_age, type=c("norm"), conf=0.95) #cálcul
 conf_int
 
 #Extraemos los valores inferiores y superiores del intervalo de confianza
-ic_sup<-conf_int$normal[3]
-ic_inf<-conf_int$normal[2]
+summ$ic_sup<-conf_int$normal[3]
+summ$ic_inf<-conf_int$normal[2]
 ic_sup
 ic_inf
 
