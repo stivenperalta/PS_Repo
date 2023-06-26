@@ -116,9 +116,9 @@ stargazer(model1, model2, model3, model4, model5, model6, model7,
 MSE_table<-c(MSE_model1, MSE_model2, MSE_model3, MSE_model4, MSE_model5,MSE_model6,MSE_model7)
 x_label<-c('Modelo 1','Modelo 2', 'Modelo 3', 'Modelo 4', 'Modelo 5','Modelo 6','Modelo 7')
 MSEtabla<-data.frame(Columna1 = x_label,Columna2 = MSE_table)
-dataframe <- data.frame(Columna1 = MSEtabla$Columna1, Columna2 = MSEtabla$Columna2)
-colnames(dataframe) <- c("Modelo", "MSE")
-print(dataframe)
+prediccion_errores <- data.frame(Columna1 = MSEtabla$Columna1, Columna2 = MSEtabla$Columna2)
+colnames(prediccion_errores) <- c("Modelo", "MSE")
+print(prediccion_errores)
 
 stargazer(prediccion_errores, summary = FALSE, title= "Tabla 5.2 Errores de prediccion", type = "text", out= "../views/errores de prediccion.html")
 
