@@ -159,7 +159,7 @@ tabla_edades_cc <- kable(resumen_edad_cc, format = "html", align = "c", caption 
 tabla_edades_cc
 
 #Función para Bootstrap
-model_wage_age_fn<- function(data, index, women) {
+model_wa_MH_fn<- function(data, index, women) {
   subset_data<-data[data[['mujer']]==women,]
   f<- lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa), 
          data=subset_data, 
@@ -173,14 +173,15 @@ model_wage_age_fn<- function(data, index, women) {
   return(edad_max_bt)
 }
 
-model_wage_age_fn(GEIH,1:nrow(GEIH),0) #para verificar que nos de el mismo peak age en el modelo general
+model_wa_MH_fn(GEIH,1:nrow(GEIH),1) #para verificar que nos de el mismo peak age en el modelo general
 
 #MUJERES
 set.seed(12345) #para que sea reproducible
-err_est_m<-boot(GEIH,model_wage_age_fn,R=1000, women=1)
+err_est_m<-boot(GEIH,model_wa_MH_fn,R=1000, women=1)
 plot(err_est_m) #para ver la distribución de los resultados de boot
 
 se_m<- apply(err_est_m$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
+se_m
 
 #HOMBRES
 set.seed(12345) #para que sea reproducible
@@ -188,7 +189,7 @@ err_est_h<-boot(GEIH,model_wage_age_fn,R=1000, women=0)
 plot(err_est_h) #para ver la distribución de los resultados de boot
 
 se_h<- apply(err_est_h$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
-
+se_h
 
 # Confidence Intervals ----------------------------------------------------
 
@@ -199,8 +200,8 @@ conf_int_m<-boot.ci(boot.out=err_est_m, type=c("norm"), conf=0.95) #cálculo de 
 conf_int_m
 
 #Extraemos los valores inferiores y superiores del intervalo de confianza
-ic_supM<-conf_int$normal[3]
-ic_infM<-conf_int$normal[2]
+ic_supM<-conf_int_m$normal[3]
+ic_infM<-conf_int_m$normal[2]
 IC_Mujer=c(edad_m,ic_infM,ic_supM)
 IC_Mujer
 
@@ -211,8 +212,8 @@ conf_int_h<-boot.ci(boot.out=err_est_h, type=c("norm"), conf=0.95) #cálculo de 
 conf_int_h
 
 #Extraemos los valores inferiores y superiores del intervalo de confianza
-ic_supH<-conf_int$normal[3]
-ic_infH<-conf_int$normal[2]
+ic_supH<-conf_int_h$normal[3]
+ic_infH<-conf_int_h$normal[2]
 IC_Homb=c(edad_h,ic_infH,ic_supH)
 IC_Homb
 
@@ -222,7 +223,7 @@ resumen_MH <- format(data.frame(Mujeres=IC_Mujer,
                                 Hombres=IC_Homb), digits=3)
 
 path2<-"../views/tabla_edadescc.html"
-tabla_MH<- kable(resumen_MH, format = "html", align = "c", caption = "Edades pico con IC") %>%
+tabla_MH<- kable(resumen_MH, format = "html", align = "c", caption = "Edades Max Salario IC") %>%
   kable_classic(full_width = F, html_font = "Cambria") %>%
   cat(resumen_MH, file = path2 )
 tabla_MH
