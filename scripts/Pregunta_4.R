@@ -23,6 +23,8 @@ names(GEIH)
 
 # Model 1 -----------------------------------------------------------------
 #Model1: log(w) = β1 + β2Female + u
+GEIH<-GEIH[complete.cases(GEIH$tamaño_empresa),]
+GEIH<-GEIH[complete.cases(GEIH$relacion_laboral),]
 
 reg_w_fem<-lm(formula=log_salario_hora_imputado~mujer, data=GEIH) #modelo general
 reg_w_fem$AIC<-AIC(reg_w_fem) #Akaike para modelo general
@@ -30,8 +32,6 @@ reg_w_fem$AIC<-AIC(reg_w_fem) #Akaike para modelo general
 # Model 2: FWL ------------------------------------------------------------
 
 #Modelo2: log(w) = β1 + β2Female + relacion_laboral + eduacion+ edad+ edad2 + tamaño empresa + u [usando FWL]
-GEIH$relacion_laboral[is.na(GEIH$relacion_laboral)]<-9
-GEIH<-GEIH[complete.cases(GEIH$tamaño_empresa),]
 
 GEIH<-GEIH %>% mutate(muj_res=lm(mujer~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa), GEIH)$residuals,#capturamos los residuales de mujer
                       sal_res=lm(log_salario_hora_imputado~edad+edad2+educacion_tiempo+as.factor(relacion_laboral)+as.factor(tamaño_empresa),GEIH)$residuals) #capturamos los residuales del salario
@@ -115,10 +115,10 @@ reg_m$AIC<-AIC(reg_m) #Akaike para modelo mujeres
 reg_h$AIC<-AIC(reg_h) #Akaike para modelo hombres
 
 #Con los tres modelos
-stargazer(reg_mh, reg_m, reg_h, type="text",title="Tabla 4.3: Regresión Salario-Genero", keep=c("mujer","edad","edad2"),
-          dep.var.labels="Ln(salario)",covariate.labels=c("Mujer","Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/salario_ge.html",
+stargazer(reg_mh, reg_m, reg_h, type="text",title="Tabla 4.2: Regresión Salario-Edad por Género", keep=c("edad","edad2"),
+          dep.var.labels="Ln(salario)",covariate.labels=c("Edad","Edad2"),omit.stat=c("ser","f","adj.rsq","aic"), out="../views/salario_ge.html",
           add.lines=list(c("AIC", round(AIC(reg_mh),1), round(AIC(reg_m),1), round(AIC(reg_h),1)),c('Variables de Control', 'Si','Si','Si')),
-          notes=c("Las variable de control empleadas son educación,", 
+          notes=c("Las variable de control empleadas son edad, educación,", 
                   "ocupación y tamaño de la empresa."), notes.align="c")
 
 # Coefficients ------------------------------------------------------------
