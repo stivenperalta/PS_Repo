@@ -23,7 +23,7 @@ GEIH <- GEIH %>%
   filter(!is.na(relacion_laboral)) %>%
   mutate(educacion_tiempo2 = educacion_tiempo^2,
          edad3 = edad^3)%>%
-  rename(mujer=sexo) 
+  rename(mujer=sexo)
 
 #ESTADISTICAS DESCRIPTIVAS
 stargazer(data.frame(GEIH), header=FALSE, type='text',title="Variables en el Data Set")
@@ -192,7 +192,7 @@ stargazer(data.frame(cola_superior), header=FALSE, type='text',title="Variables 
 
 ###############################################################################
 
-### LOOCV para el modelo con mejor performance predictivo, es decir, model 6
+### LOOCV para el modelo con mejor performance predictivo, es decir, model 7
 
 control <- trainControl(method = "LOOCV")
 modelo_LOOCV1 <- train(log_salario_hora_imputado ~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + edad * mujer, 
@@ -200,7 +200,7 @@ modelo_LOOCV1 <- train(log_salario_hora_imputado ~ mujer + edad + edad2 + edad3 
                        method = "lm", 
                        trControl = control)
 
-# Resumen del modelo
+# Resumen del modelo 7
 LOOCV1 <- summary(modelo_LOOCV1)
 
 # Obtener los coeficientes y estadísticas del modelo
@@ -236,7 +236,7 @@ modelo_LOOCV2 <- train(log_salario_hora_imputado~ mujer + edad + edad2 + educaci
                 method = "lm", 
                 trControl = control)
 
-#### Resumen del modelo 7
+#### Resumen del modelo 6
 LOOCV2 <- summary(modelo_LOOCV2)
 
 # Obtener los coeficientes y estadísticas del modelo
