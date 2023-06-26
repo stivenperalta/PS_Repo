@@ -95,11 +95,10 @@ comparison.df<-format(data.frame(Modelo=tags,Regression=reg_muj,FWL=reg_fwl,FWL_
 # Exportar la tabla
 ruta <- "../views/tabla_comp.html" 
 tabla_comp <- kable(comparison.df, format = "html", align = "c", caption = "Tabla 4.2: Comparación de Modelos") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  cat(comparison.df, file = ruta)
+  kable_classic(full_width = F, html_font = "Cambria")
+
+writeLines(tabla_comp, ruta)
 tabla_comp
-
-
 
 # Peak salaries by gender with controls -----------------------------------
 
@@ -154,8 +153,8 @@ resumen_edad_cc <- format(data.frame(General=edad_mh,
 
 path2<-"../views/tabla_edadescc.html"
 tabla_edades_cc <- kable(resumen_edad_cc, format = "html", align = "c", caption = "Edades pico en salario con controles") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  cat(resumen_edad_cc, file = path2 )
+  kable_classic(full_width = F, html_font = "Cambria")
+writeLines(tabla_edades_cc, path2 )
 tabla_edades_cc
 
 #Función para Bootstrap
@@ -185,7 +184,7 @@ se_m
 
 #HOMBRES
 set.seed(12345) #para que sea reproducible
-err_est_h<-boot(GEIH,model_wage_age_fn,R=1000, women=0)
+err_est_h<-boot(GEIH,model_wa_MH_fn,R=1000, women=0)
 plot(err_est_h) #para ver la distribución de los resultados de boot
 
 se_h<- apply(err_est_h$t,2,sd)[1] #grabamos el valor del error estándar en el objeto se
@@ -222,13 +221,12 @@ IC_Homb
 resumen_MH <- format(data.frame(Mujeres=IC_Mujer,
                                 Hombres=IC_Homb), digits=3)
 
-path2<-"../views/tabla_edadescc.html"
+path3<-"../views/tabla_edadescc.html"
 tabla_MH<- kable(resumen_MH, format = "html", align = "c", caption = "Edades Max Salario IC") %>%
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  cat(resumen_MH, file = path2 )
+  kable_classic(full_width = F, html_font = "Cambria")
+
+writeLines(tabla_MH, path2 )
 tabla_MH
-
-
 
 
 
