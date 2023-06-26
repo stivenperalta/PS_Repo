@@ -1,12 +1,12 @@
 ############################# problem set 1 ###################################
-# Autores: Sergio Jimenez y Andrea Clavijo
-# SI ENCUENTRA ALGUN ERROR O SUGERENCIA POR FAVOR CONTACTEME
-# correo: sa.jimenezo1@uniandes.edu.co/ ay.clavijo@uniandes.edu.co
-# fecha: 24/06/2023
+# Autores: Stiven Peralta, Jazmine Galdos, Andrea Clavijo, Sergio Jim茅nez, Nicol谩s Barrag谩n 
+# Si encuentra alg?n error o tiene sugerencias por favor cont?cteme
+# correo: ds.peralta@uniandes.edu.co
+# fecha: 25/06/2023
 ###############################################################################
 
 rm(list = ls()) # Limpiar Rstudio
-options(scipen = 20,  digits=3) # establezco la notacion cient铆fica y el n煤mero de decimales
+options(scipen = 20,  digits=3) # establezco la notacion cient脙颅fica y el n脙潞mero de decimales
 require(pacman)
 # Cargo varios paquetes al tiempo
 p_load(ggplot2, rio, tidyverse, skimr, caret, rvest, magrittr, openxlsx,
@@ -18,7 +18,7 @@ GEIH <- read_excel("../stores/GEIH")
 
 GEIH$estrato <- factor(GEIH$estrato)
 GEIH$relacion_laboral <- factor(GEIH$relacion_laboral)
-GEIH$tama駉_empresa <- factor(GEIH$tama駉_empresa)
+GEIH$tama帽o_empresa <- factor(GEIH$tama帽o_empresa)
 GEIH <- GEIH %>%
   filter(!is.na(relacion_laboral)) %>%
   mutate(educacion_tiempo2 = educacion_tiempo^2,
@@ -31,7 +31,7 @@ stargazer(data.frame(GEIH), header=FALSE, type='text',title="Variables en el Dat
 ###############################################################################
 ######################### PUNTO 5 - PREDICCION ################################
 
-#generaci髇 de grupo train - test
+#generaci贸n de grupo train - test
 #Definimos semilla para hacerlo reproducible
 set.seed(777)
 
@@ -47,32 +47,32 @@ dim(train)
 dim(test)
 
 ###############################################################################
-#   Especificaci髇 de modelos
+#   Especificaci贸n de modelos
 ##############################################################################
 
-# especificaci髇 1: salario ~ edad + edad2
+# especificaci贸n 1: salario ~ edad + edad2
 model1<-lm(log_salario_hora_imputado~edad + edad2,data=train)
 summary(model1)
 test$model1<-predict(model1,newdata = test)
 MSE_model1<-with(test,mean((log_salario_hora_imputado-model1)^2))
 MSE_model1
 
-# especificaci髇 2: salario ~ mujer 
+# especificaci贸n 2: salario ~ mujer 
 model2<-lm(log_salario_hora_imputado~mujer,data=train)
 summary(model2)
 test$model2<-predict(model2,newdata = test)
 MSE_model2<-with(test,mean((log_salario_hora_imputado-model2)^2))
 MSE_model2
 
-# especificaci髇 3: salario ~ mujer+edad2+educacion_tiempo+tama駉_empresa
+# especificaci贸n 3: salario ~ mujer+edad2+educacion_tiempo+tama帽o_empresa
 
-model3<-lm(log_salario_hora_imputado ~ edad + edad2 + educacion_tiempo + tama駉_empresa,data=train)
+model3<-lm(log_salario_hora_imputado ~ edad + edad2 + educacion_tiempo + tama帽o_empresa,data=train)
 summary(model3)
 test$model3<-predict(model3,newdata = test)
 MSE_model3<-with(test,mean((log_salario_hora_imputado-model3)^2))
 MSE_model3
 
-# especificaci髇 4: salario ~ mujer + edad + edad2 + educacion_tiempo + (interaccion entre edad y genero)
+# especificaci贸n 4: salario ~ mujer + edad + edad2 + educacion_tiempo + (interaccion entre edad y genero)
 model4<-lm(log_salario_hora_imputado ~ mujer + edad + edad2 + educacion_tiempo + mujer * edad,data=train)
 summary(model4)
 test$model4<-predict(model4,newdata = test)
@@ -80,7 +80,7 @@ MSE_model4<-with(test,mean((log_salario_hora_imputado-model4)^2))
 MSE_model4
 
 
-# especificacion 5: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato + (Interacci髇 entre edad y g閚ero) 
+# especificacion 5: salario ~ mujer + edad + edad2 + educacion_tiempo  + estrato + (Interacci贸n entre edad y g茅nero) 
 model5<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + educacion_tiempo  + estrato + edad * mujer,data=train)
 summary(model5)
 test$model5<-predict(model5,newdata = test)
@@ -94,7 +94,7 @@ test$model6<-predict(model6,newdata = test)
 MSE_model6<-with(test,mean((log_salario_hora_imputado-model6)^2))
 MSE_model6
 
-# especificacion 7: salario ~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + (Interacci髇 entre edad y genero)
+# especificacion 7: salario ~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + (Interacci贸n entre edad y genero)
 model7<-lm(log_salario_hora_imputado~ mujer + edad + edad2 + edad3 + educacion_tiempo + educacion_tiempo2 + estrato + edad * mujer,data=train)
 summary(model7)
 test$model7<-predict(model7,newdata = test)
@@ -109,10 +109,10 @@ stargazer(model1, model2, model3, model4, model5, model6, model7,
           out = "../views/modelos_predictivos.html",
           omit.stat = c("f", "ser"),
           omit = c("Constant", "R^2", "Adj. R^2"),
-          notes = c("Errores est醤dar en par閚tesis")
+          notes = c("Errores est谩ndar en par茅ntesis")
 )
 
-#Los resultados de la predicci髇 (MSE) de los modelos para los modelos previos y nuevos se condensan a continuaci髇:
+#Los resultados de la predicci贸n (MSE) de los modelos para los modelos previos y nuevos se condensan a continuaci贸n:
 MSE_table<-c(MSE_model1, MSE_model2, MSE_model3, MSE_model4, MSE_model5,MSE_model6,MSE_model7)
 x_label<-c('Modelo 1','Modelo 2', 'Modelo 3', 'Modelo 4', 'Modelo 5','Modelo 6','Modelo 7')
 MSEtabla<-data.frame(Columna1 = x_label,Columna2 = MSE_table)
@@ -128,19 +128,19 @@ MSEmodelos<-ggplot(data=MSEtabla, aes(x = x_label, y = MSE_table, group=1)) +
     geom_point() +
     ggtitle("MSE de los modelos especificados") +
     ylab("MSE") +
-    xlab ("N鷐ero de modelo")
+    xlab ("N煤mero de modelo")
 MSEmodelos
 
-# Guardamos el gr醘ico en formato JPG
+# Guardamos el gr谩fico en formato JPG
 ggsave(filename = "../views/MSE de los modelos especificados.jpg", plot = MSEmodelos)
 
 #Posteriormente, para tener idea de cuales modelos tienen el MSE mas bajo
 ordenMSE <- prediccion_errores[order(prediccion_errores$MSE), ]
 View(ordenMSE)
 
-stargazer(ordenMSE, summary = FALSE, title= "Tabla 5.3 Modelos escogidos para validaci髇 cruzada", type = "text", out= "../views/ordenMSE.html")
+stargazer(ordenMSE, summary = FALSE, title= "Tabla 5.3 Modelos escogidos para validaci贸n cruzada", type = "text", out= "../views/ordenMSE.html")
 
-#predecimos los errores para los modelos para realizar el gr醘ico de predicci髇 de los errores
+#predecimos los errores para los modelos para realizar el gr谩fico de predicci贸n de los errores
 #e identificar posibles outliers
 test$error_prediccion_model1 = test$log_salario_hora_imputado - test$model1
 test$error_prediccion_model2 = test$log_salario_hora_imputado - test$model2
@@ -159,17 +159,17 @@ distribucion_error <- ggplot(test) +
   geom_density(aes(x = error_prediccion_model5, color = "Modelo 5"), fill = NA, size = .5) +
   geom_density(aes(x = error_prediccion_model6, color = "Modelo 6"), fill = NA, size = .5) +
   geom_density(aes(x = error_prediccion_model7, color = "Modelo 7"), fill = NA, size = .5) +
-  labs(title = "Distribuci贸n de Errores de Predicci贸n",
-       x = "Error de Predicci贸n", y = "Densidad",
+  labs(title = "Distribuci脙鲁n de Errores de Predicci脙鲁n",
+       x = "Error de Predicci脙鲁n", y = "Densidad",
        color = "Modelo") +
   scale_color_manual(values = c("#5E4FA2", "#3288BD", "#66C2A5", "#ABDDA4", "#FEE08B", "#FDAE61", "#D53E4F"),
                      labels = c("Modelo 1", "Modelo 2", "Modelo 3", "Modelo 4", "Modelo 5", "Modelo 6", "Modelo 7"))
 
-# Guardamos el gr醘ico en formato JPG
+# Guardamos el gr谩fico en formato JPG
 ggsave(filename = "../views/distribucion de errores de prediccion.jpg", plot = distribucion_error, width = 6, height = 3, dpi = 300)
 
-#Con estos test validamos la existencia de valores at韕icos en las colas de 
-#la distribuci髇 del modelo 6 y modelo 7
+#Con estos test validamos la existencia de valores at铆picos en las colas de 
+#la distribuci贸n del modelo 6 y modelo 7
 
 cola_inferior6 <- test %>%
   filter(error_prediccion_model6 < quantile(error_prediccion_model6, 0.05))
@@ -186,7 +186,7 @@ stargazer(data.frame(GEIH), header=FALSE, type='text',title="Variables en el Dat
 stargazer(data.frame(cola_inferior), header=FALSE, type='text',title="Variables en cola inferior")
 stargazer(data.frame(cola_superior), header=FALSE, type='text',title="Variables en cola superior")
 
-# De todos los modelos presentados, los que tienen un menor MSE son los modelos 6 y 7  Es decir, en donde se tiene un mejor performance en la predicci髇. 
+# De todos los modelos presentados, los que tienen un menor MSE son los modelos 6 y 7  Es decir, en donde se tiene un mejor performance en la predicci贸n. 
 # Sin embargo, los MSE son muy similares a los modelos lineales mas sencillos.
 
 
@@ -203,7 +203,7 @@ modelo_LOOCV1 <- train(log_salario_hora_imputado ~ mujer + edad + edad2 + edad3 
 # Resumen del modelo 7
 LOOCV1 <- summary(modelo_LOOCV1)
 
-# Obtener los coeficientes y estad韘ticas del modelo
+# Obtener los coeficientes y estad铆sticas del modelo
 coeficientes_loocv <- coef(modelo_LOOCV1$finalModel)
 estadisticas_loocv <- summary(modelo_LOOCV1$finalModel)$coefficients[, c("Estimate", "Std. Error", "t value", "Pr(>|t|)")]
 
@@ -218,7 +218,7 @@ Resultados_LOOCV <- dplyr::select(Resultados_LOOCV, Variable, Estimate, `Std. Er
 #exportar resultados de regresion
 stargazer(Resultados_LOOCV, summary = FALSE, type = "text", out= "../views/modelo_LOOCV1.html")
 
-#calculamos el RMSE para comparar con los de la validaci髇 cruzada
+#calculamos el RMSE para comparar con los de la validaci贸n cruzada
 RMSE_modelLOOCV<-modelo_LOOCV$results
 RMSE_modelLOOCV<-RMSE_modelLOOCV$RMSE
 RMSE_modelLOOCV<-mean(RMSE_modelLOOCV)
@@ -239,7 +239,7 @@ modelo_LOOCV2 <- train(log_salario_hora_imputado~ mujer + edad + edad2 + educaci
 #### Resumen del modelo 6
 LOOCV2 <- summary(modelo_LOOCV2)
 
-# Obtener los coeficientes y estad韘ticas del modelo
+# Obtener los coeficientes y estad铆sticas del modelo
 coeficientes_loocv2 <- coef(modelo_LOOCV2$finalModel)
 estadisticas_loocv2 <- summary(modelo_LOOCV2$finalModel)$coefficients[, c("Estimate", "Std. Error", "t value", "Pr(>|t|)")]
 
