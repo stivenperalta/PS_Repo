@@ -38,7 +38,7 @@ glimpse(base_geih2018)
 write.xlsx(base_geih2018, "Base_unida")
 
 # Cargo la base
-base_geih2018 <- read_excel("Base_unida")
+base_geih2018 <- read_excel("../stores/Base_unida")
 
 # Determino las variables de interés y elimino las demás
 GEIH <- base_geih2018 %>%
@@ -160,7 +160,7 @@ write.xlsx(GEIH, "GEIH")
 # 3) Evalúo las estadísticas descriptivas de las variables de interés #########
 rm(list = ls()) # Limpiar Rstudio
 # Cargo la base limpia
-GEIH <- read_excel("GEIH") # Si no quiere correr todo el código, pueden correr esta línea y les importa la base límpia
+GEIH <- read_excel("../stores/GEIH") # Si no quiere correr todo el código, pueden correr esta línea y les importa la base límpia
 names(GEIH)
 
 # Creo los estadísticos descriptivos de las principales variables de interés

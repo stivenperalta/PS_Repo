@@ -1,3 +1,10 @@
+############################## Problem Set 1 ###################################
+# Autores: Stiven Peralta, Jazmine Galdos, Andrea Clavijo, Sergio Jiménez, Nicolás Barragán 
+# Si encuentra alg?n error o tiene sugerencias por favor cont?cteme
+# correo: ds.peralta@uniandes.edu.co
+# fecha: 25/06/2023
+################################################################################
+
 # Preparación -------------------------------------------------------------
 
 rm(list = ls()) # Limpiar Rstudio
