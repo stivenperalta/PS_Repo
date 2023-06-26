@@ -21,7 +21,7 @@ getwd() # verifico el directorio
 rm(carpeta, escritorio) # Limpio el ambiente
 
 # 2) Descargo y limpio la data para el análisis ################################
-descargo el contenido de las 10 páginas 
+# descargo el contenido de las 10 páginas 
 tablas_html <- vector("list", 10) # creo una lista para guardar los enlaces
 for (i in 1:10) {
   urls <- paste0("https://ignaciomsarmiento.github.io/GEIH2018_sample/pages/geih_page_", i, ".html")
