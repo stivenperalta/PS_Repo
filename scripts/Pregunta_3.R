@@ -199,6 +199,7 @@ ic_inf
 grafica <- ggplot(GEIH, aes(x=edad, y=log_salario_hora_imputado)) +
   geom_point(col=4, size=0.2) +
   geom_line(data = summ, aes(x = edad, y = yhat_reg_edad), color = 7, size=1)+
+  geom_errorbar(aes(ymin=ic_inf, ymax=ic_sup), width=0.2)+
   labs (x='Edad', y="ln Salario", title='Gráfico 3.2: Ln Salario por edad', subtitle='Hombres y Mujeres')
 
 grafica
