@@ -249,7 +249,22 @@ graficaMHCC
 #Exportamos la gráfica
 ggsave("../views/lnsalario_mujer_vs_hombreCC.jpg", graficaMHCC, dpi = 300, width = 6, height = 4, units = "in")
 
+##T-test
+#Queremos probar si 
 
+# Sample data
+df <- data.frame(
+  group = c("Men", "Men", "Women", "Women", "Men", "Women"),
+  value = c(10, 12, 8, 9, 15, 12)
+)
 
+# Perform t-test
+result <- t.test(edad ~ mujer, data = GEIH)
+
+# Extract the p-value
+p_value <- result$p.value
+
+# Print the result
+cat("p-value:", p_value)
 
 
